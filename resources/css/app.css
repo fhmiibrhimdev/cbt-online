@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .show-entries {
+        @apply tw-ml-4 tw-flex tw-justify-center lg:tw-justify-start;
+    }
+
+    .search-column {
+        @apply tw-mb-5 tw-mt-3 tw-flex tw-justify-center lg:tw-mt-[-45px] lg:tw-justify-start;
+    }
+
+    .btn-modal {
+        @apply tw-fixed tw-bottom-12 tw-right-7 tw-z-40 tw-h-14 tw-w-14 tw-rounded-full tw-bg-slate-900 tw-text-white tw-shadow-2xl hover:tw-border-slate-600 hover:tw-bg-slate-700;
+    }
+}
+
+@layer utilities {
+    body {
+        @apply tw-tracking-wider;
+    }
+
+    .section > .section-header {
+        @apply tw-px-6 tw-rounded-none tw-shadow-md tw-shadow-gray-200 lg:tw-rounded-lg;
+    }
+
+    .section > .section-header > h1 {
+        @apply tw-mb-1 tw-text-lg tw-tracking-wider;
+    }
+
+    .card-body {
+        @apply tw-px-0;
+    }
+
+    table {
+        @apply tw-w-full tw-table-fixed;
+    }
+
+    table > thead > tr {
+        @apply tw-text-xs tw-uppercase tw-tracking-widest;
+    }
+
+    table > tbody > tr {
+        @apply tw-text-gray-700;
+    }
+
+    table > thead > tr > th {
+        @apply tw-bg-gray-100 tw-p-4 tw-text-xs tw-text-gray-600;
+    }
+
+    table > tbody > tr > td {
+        @apply tw-border-b tw-text-sm tw-tracking-normal tw-border-gray-100 tw-px-4 tw-py-2;
+    }
+
+    table > tbody {
+        @apply tw-text-black;
+    }
+
+    .card-body > h3 {
+        @apply tw-mb-5 tw-ml-4 tw-text-base tw-text-black;
+    }
+
+    .show-entries > p.show-entries-show {
+        @apply tw-mr-1 tw-mt-1 tw-text-gray-800;
+    }
+
+    .show-entries > p.show-entries-entries {
+        @apply tw-ml-1 tw-mt-1 tw-text-gray-800;
+    }
+
+    .show-entries > select {
+        @apply tw-rounded-lg tw-border tw-px-4 tw-py-1 tw-border-gray-200;
+    }
+
+    .search-column > p {
+        @apply tw-ml-0 tw-mr-1 tw-mt-1 tw-text-gray-800 lg:tw-ml-auto;
+    }
+
+    .search-column > input {
+        @apply tw-mr-4 tw-w-2/3 tw-rounded-lg tw-border tw-border-gray-200 lg:tw-w-1/4;
+    }
+
+    .main-content {
+        @apply tw-px-0;
+    }
+
+    .card {
+        @apply tw-rounded-none tw-shadow-md tw-shadow-gray-300 lg:tw-rounded-lg;
+    }
+
+    .card > .card-body {
+        @apply tw-px-0;
+    }
+
+    .card > h3 {
+        @apply tw-tracking-wider tw-text-[#34395e] tw-ml-6 tw-mt-6 tw-mb-5 lg:tw-mb-1 tw-text-base tw-font-semibold;
+    }
+
+    .section-body {
+        @apply tw-mt-[-10px];
+    }
+
+    input.form-control {
+        @apply tw-rounded-lg tw-border tw-border-gray-200 tw-text-sm;
+    }
+
+    select.form-control {
+        @apply tw-rounded-lg;
+    }
+
+    textarea.form-control {
+        @apply tw-rounded-lg;
+    }
+
+    .navbar.navbar-expand-lg.main-navbar {
+        @apply tw-px-0 lg:tw-px-5;
+    }
+}
