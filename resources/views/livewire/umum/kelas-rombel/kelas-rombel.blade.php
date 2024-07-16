@@ -216,14 +216,7 @@
         }
 
         function countList() {
-            var count = 0;
-            var len = 0;
-            $('ul').each(function(){
-                if(count != 0){
-                    len = $(this).find('li:visible').length;
-                }
-                count++;
-            });
+            var len = $('#my-select-searchable option:selected').length;
             @this.set('jumlah_siswa', len)
             return len
         }
