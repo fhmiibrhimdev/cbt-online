@@ -22,10 +22,10 @@ class TahunPelajaran extends Component
         'tahun'               => 'required|unique:tahun_pelajaran',
     ];
 
-    public $lengthData = 25;
+    public $lengthData         = 25;
     public $searchTerm;
     public $previousSearchTerm = '';
-    public $isEditing = false;
+    public $isEditing          = false;
 
     public $dataId;
 
@@ -33,22 +33,22 @@ class TahunPelajaran extends Component
 
     public function mount()
     {
-        $this->tahun               = '';
+        $this->tahun = '';
     }
 
     public function render()
     {
         $this->searchResetPage();
-        $search = '%'.$this->searchTerm.'%';
+        $search           = '%' . $this->searchTerm . '%';
 
         $tahun_pelajarans = ModelsTahunPelajaran::select('tahun_pelajaran.*')
-                ->where(function ($query) use ($search) {
-                    $query->where('tahun', 'LIKE', $search);
-                })
-                ->orderBy('id', 'ASC')
-                ->paginate($this->lengthData);
+            ->where(function ($query) use ($search) {
+                $query->where('tahun', 'LIKE', $search);
+            })
+            ->orderBy('id', 'ASC')
+            ->paginate($this->lengthData);
 
-        $semesters = Semester::get();
+        $semesters        = Semester::get();
 
         return view('livewire.umum.tahun-pelajaran', compact('tahun_pelajarans', 'semesters'));
     }
@@ -69,7 +69,7 @@ class TahunPelajaran extends Component
         $this->validate();
 
         ModelsTahunPelajaran::create([
-            'tahun'               => $this->tahun,
+            'tahun' => $this->tahun,
         ]);
 
         $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
@@ -77,20 +77,19 @@ class TahunPelajaran extends Component
 
     public function edit($id)
     {
-        $this->isEditing        = true;
-        $data = ModelsTahunPelajaran::where('id', $id)->first();
-        $this->dataId           = $id;
-        $this->tahun            = $data->tahun;
+        $this->isEditing = true;
+        $data            = ModelsTahunPelajaran::where('id', $id)->first();
+        $this->dataId    = $id;
+        $this->tahun     = $data->tahun;
     }
 
     public function update()
     {
         $this->validate();
 
-        if( $this->dataId )
-        {
+        if ($this->dataId) {
             ModelsTahunPelajaran::findOrFail($this->dataId)->update([
-                'tahun'               => $this->tahun,
+                'tahun' => $this->tahun,
             ]);
 
             $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');
@@ -102,8 +101,8 @@ class TahunPelajaran extends Component
     {
         $this->dataId = $id;
         $this->dispatch('swal:confirm', [
-            'type'      => 'warning',  
-            'message'   => 'Are you sure?', 
+            'type'      => 'warning',
+            'message'   => 'Are you sure?',
             'text'      => 'If you delete the data, it cannot be restored!'
         ]);
     }
@@ -124,15 +123,15 @@ class TahunPelajaran extends Component
         if ($this->searchTerm !== $this->previousSearchTerm) {
             $this->resetPage();
         }
-    
+
         $this->previousSearchTerm = $this->searchTerm;
     }
 
     private function dispatchAlert($type, $message, $text)
     {
         $this->dispatch('swal:modal', [
-            'type'      => $type,  
-            'message'   => $message, 
+            'type'      => $type,
+            'message'   => $message,
             'text'      => $text
         ]);
 
@@ -143,7 +142,7 @@ class TahunPelajaran extends Component
     {
         $this->isEditing = $mode;
     }
-    
+
     private function resetInputFields()
     {
         $this->tahun               = '';

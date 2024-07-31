@@ -11,14 +11,14 @@ use Livewire\Attributes\Title;
 class Profile extends Component
 {
     #[Title('Setting Profile')]
-    
+
     public $name, $email, $password, $current_password, $password_confirmation;
 
     public function mount()
     {
-        $user = Auth::user();
+        $user        = Auth::user();
 
-        $this->name = $user->name;
+        $this->name  = $user->name;
         $this->email = $user->email;
     }
 
@@ -30,8 +30,8 @@ class Profile extends Component
     private function dispatchAlert($type, $message, $text)
     {
         $this->dispatch('swal:modal', [
-            'type'      => $type,  
-            'message'   => $message, 
+            'type'      => $type,
+            'message'   => $message,
             'text'      => $text
         ]);
     }
@@ -39,8 +39,8 @@ class Profile extends Component
     public function updateProfile()
     {
         $this->validate([
-            'name'      => 'required',
-            'email'     => 'required|email'
+            'name'  => 'required',
+            'email' => 'required|email'
         ]);
 
         $data   = User::findOrFail(Auth::user()->id);
@@ -57,7 +57,7 @@ class Profile extends Component
             'current_password'  => 'required',
             'password'          => 'required'
         ]);
-        
+
         $user   = User::findOrFail(Auth::user()->id);
 
         if (!Hash::check($this->current_password, $user->password)) {

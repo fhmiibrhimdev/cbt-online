@@ -26,6 +26,14 @@ class DatabaseSeeder extends Seeder
             JenisUjianSeeder::class,
             SesiSeeder::class,
             RuangSeeder::class,
+            KopKartuSeeder::class,
+            KopAbsensiSeeder::class,
+            ProfileSekolahSeeder::class,
+            RunningTextSeeder::class,
+            RaportAdminSettingSeeder::class,
+
+            AdministratorSeeder::class,
+            UserAndSiswaSeeder::class,
         ]);
     }
 }

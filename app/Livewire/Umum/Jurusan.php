@@ -21,10 +21,10 @@ class Jurusan extends Component
         'nama_jurusan' => 'required',
     ];
 
-    public $lengthData = 25;
+    public $lengthData         = 25;
     public $searchTerm;
     public $previousSearchTerm = '';
-    public $isEditing = false;
+    public $isEditing          = false;
 
     public $dataId, $nama_jurusan, $kode_jurusan;
     public $mapel_peminatan = [];
@@ -47,25 +47,25 @@ class Jurusan extends Component
         if ($this->searchTerm !== $this->previousSearchTerm) {
             $this->resetPage();
         }
-    
+
         $this->previousSearchTerm = $this->searchTerm;
     }
 
     public function render()
     {
         $this->searchResetPage();
-        $search = '%'.$this->searchTerm.'%';
+        $search     = '%' . $this->searchTerm . '%';
 
-        $data = ModelsJurusan::where('nama_jurusan', 'LIKE', $search)
-                    ->orWhere('kode_jurusan', 'LIKE', $search)
-                    ->paginate($this->lengthData);
+        $data       = ModelsJurusan::where('nama_jurusan', 'LIKE', $search)
+            ->orWhere('kode_jurusan', 'LIKE', $search)
+            ->paginate($this->lengthData);
 
         $kelompok_c = MataPelajaran::where('id_kelompok', '3')->get();
 
-        $kelompoks = KelompokMapel::select('mata_pelajaran.id', 'kode_kelompok', 'nama_kelompok', 'nama_mapel')
-                        ->join('mata_pelajaran', 'mata_pelajaran.id_kelompok', 'kelompok_mapel.id')
-                        ->where('id_parent', '3')
-                        ->get();
+        $kelompoks  = KelompokMapel::select('mata_pelajaran.id', 'kode_kelompok', 'nama_kelompok', 'nama_mapel')
+            ->join('mata_pelajaran', 'mata_pelajaran.id_kelompok', 'kelompok_mapel.id')
+            ->where('id_parent', '3')
+            ->get();
 
         return view('livewire.umum.jurusan', compact('data', 'kelompok_c', 'kelompoks'));
     }
@@ -73,8 +73,8 @@ class Jurusan extends Component
     private function dispatchAlert($type, $message, $text)
     {
         $this->dispatch('swal:modal', [
-            'type'      => $type,  
-            'message'   => $message, 
+            'type'      => $type,
+            'message'   => $message,
             'text'      => $text
         ]);
 
@@ -112,7 +112,7 @@ class Jurusan extends Component
 
         $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
     }
-    
+
     public function edit($id)
     {
         $this->isEditing = true;
@@ -123,16 +123,16 @@ class Jurusan extends Component
         $this->mapel_peminatan  = explode(',', $data->mapel_peminatan);
         $this->dispatch('initSelect2');
     }
-    
+
     public function update()
     {
         $this->validate();
-        
+
         if ($this->dataId) {
             ModelsJurusan::findOrFail($this->dataId)->update([
-                'nama_jurusan'      => $this->nama_jurusan,
-                'kode_jurusan'      => $this->kode_jurusan,
-                'mapel_peminatan'   => implode(',', $this->mapel_peminatan),
+                'nama_jurusan'    => $this->nama_jurusan,
+                'kode_jurusan'    => $this->kode_jurusan,
+                'mapel_peminatan' => implode(',', $this->mapel_peminatan),
             ]);
 
             $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');
@@ -144,8 +144,8 @@ class Jurusan extends Component
     {
         $this->dataId = $id;
         $this->dispatch('swal:confirm', [
-            'type'      => 'warning',  
-            'message'   => 'Are you sure?', 
+            'type'      => 'warning',
+            'message'   => 'Are you sure?',
             'text'      => 'If you delete the data, it cannot be restored!'
         ]);
     }

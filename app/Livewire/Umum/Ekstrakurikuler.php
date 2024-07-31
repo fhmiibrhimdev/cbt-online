@@ -43,17 +43,17 @@ class Ekstrakurikuler extends Component
         if ($this->searchTerm !== $this->previousSearchTerm) {
             $this->resetPage();
         }
-    
+
         $this->previousSearchTerm = $this->searchTerm;
     }
 
     public function render()
     {
         $this->searchResetPage();
-        $search = '%'.$this->searchTerm.'%';
+        $search = '%' . $this->searchTerm . '%';
 
         $data = ModelsEkstrakurikuler::where('nama_ekstra', 'LIKE', $search)
-                    ->paginate($this->lengthData);
+            ->paginate($this->lengthData);
 
         return view('livewire.umum.ekstrakurikuler', compact('data'));
     }
@@ -61,8 +61,8 @@ class Ekstrakurikuler extends Component
     private function dispatchAlert($type, $message, $text)
     {
         $this->dispatch('swal:modal', [
-            'type'      => $type,  
-            'message'   => $message, 
+            'type'      => $type,
+            'message'   => $message,
             'text'      => $text
         ]);
 
@@ -96,20 +96,20 @@ class Ekstrakurikuler extends Component
 
         $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
     }
-    
+
     public function edit($id)
     {
-        $this->isEditing = true;
-        $data = ModelsEkstrakurikuler::findOrFail($id);
-        $this->dataId = $id;
-        $this->nama_ekstra  = $data->nama_ekstra;
-        $this->kode_ekstra  = $data->kode_ekstra;
+        $this->isEditing   = true;
+        $data              = ModelsEkstrakurikuler::findOrFail($id);
+        $this->dataId      = $id;
+        $this->nama_ekstra = $data->nama_ekstra;
+        $this->kode_ekstra = $data->kode_ekstra;
     }
-    
+
     public function update()
     {
         $this->validate();
-        
+
         if ($this->dataId) {
             ModelsEkstrakurikuler::findOrFail($this->dataId)->update([
                 'nama_ekstra' => $this->nama_ekstra,
@@ -125,8 +125,8 @@ class Ekstrakurikuler extends Component
     {
         $this->dataId = $id;
         $this->dispatch('swal:confirm', [
-            'type'      => 'warning',  
-            'message'   => 'Are you sure?', 
+            'type'      => 'warning',
+            'message'   => 'Are you sure?',
             'text'      => 'If you delete the data, it cannot be restored!'
         ]);
     }

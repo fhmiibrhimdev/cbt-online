@@ -18,10 +18,10 @@ class MataPelajaran extends Component
         'delete'
     ];
 
-    public $lengthData = 50;
+    public $lengthData         = 50;
     public $searchTerm;
     public $previousSearchTerm = '';
-    public $isEditing = false;
+    public $isEditing          = false;
 
     public $dataId, $id_kelompok;
     public $kategori, $kode_kelompok, $nama_kelompok, $id_parent;
@@ -30,16 +30,16 @@ class MataPelajaran extends Component
 
     public function mount()
     {
-        $this->id_kelompok = '';
-        $this->kategori = '';
+        $this->id_kelompok   = '';
+        $this->kategori      = '';
         $this->kode_kelompok = '';
         $this->nama_kelompok = '';
-        $this->id_parent = '0';
+        $this->id_parent     = '0';
 
-        $this->nama_mapel = '';
-        $this->kode_mapel = '';
-        $this->no_urut = '1';
-        $this->status = '1';
+        $this->nama_mapel    = '';
+        $this->kode_mapel    = '';
+        $this->no_urut       = '1';
+        $this->status        = '1';
 
         $this->dispatch('initSelect2');
     }
@@ -54,24 +54,24 @@ class MataPelajaran extends Component
         if ($this->searchTerm !== $this->previousSearchTerm) {
             $this->resetPage();
         }
-    
+
         $this->previousSearchTerm = $this->searchTerm;
     }
 
     public function render()
     {
         $this->searchResetPage();
-        $search = '%'.$this->searchTerm.'%';
+        $search          = '%' . $this->searchTerm . '%';
 
-        $data = ModelsMataPelajaran::select('mata_pelajaran.*', 'kelompok_mapel.kode_kelompok as kode_kelompok', 'kelompok_mapel.nama_kelompok as nama_kelompok')
-                    ->join('kelompok_mapel', 'kelompok_mapel.id', 'mata_pelajaran.id_kelompok')
-                    ->where(function($query) use ($search) {
-                        $query->where('nama_mapel', 'LIKE', $search)
-                              ->orWhere('kode_mapel', 'LIKE', $search);
-                    })
-                    ->orderBy('nama_kelompok', 'ASC')
-                    ->orderBy(DB::raw('CAST(no_urut AS UNSIGNED)'), 'ASC')
-                    ->paginate($this->lengthData);
+        $data            = ModelsMataPelajaran::select('mata_pelajaran.*', 'kelompok_mapel.kode_kelompok as kode_kelompok', 'kelompok_mapel.nama_kelompok as nama_kelompok')
+            ->join('kelompok_mapel', 'kelompok_mapel.id', 'mata_pelajaran.id_kelompok')
+            ->where(function ($query) use ($search) {
+                $query->where('nama_mapel', 'LIKE', $search)
+                    ->orWhere('kode_mapel', 'LIKE', $search);
+            })
+            ->orderBy('nama_kelompok', 'ASC')
+            ->orderBy(DB::raw('CAST(no_urut AS UNSIGNED)'), 'ASC')
+            ->paginate($this->lengthData);
 
         $kelompok_mapels = KelompokMapel::get();
 
@@ -81,8 +81,8 @@ class MataPelajaran extends Component
     private function dispatchAlert($type, $message, $text)
     {
         $this->dispatch('swal:modal', [
-            'type'      => $type,  
-            'message'   => $message, 
+            'type'      => $type,
+            'message'   => $message,
             'text'      => $text
         ]);
 
@@ -97,16 +97,16 @@ class MataPelajaran extends Component
 
     private function resetInputFields()
     {
-        $this->kategori = '';
+        $this->kategori      = '';
         $this->kode_kelompok = '';
         $this->nama_kelompok = '';
-        $this->id_parent = '0';
-        $this->id_kelompok = '';
+        $this->id_parent     = '0';
+        $this->id_kelompok   = '';
 
-        $this->nama_mapel = '';
-        $this->kode_mapel = '';
-        $this->no_urut = '1';
-        $this->status = '1';
+        $this->nama_mapel    = '';
+        $this->kode_mapel    = '';
+        $this->no_urut       = '1';
+        $this->status        = '1';
     }
 
     public function cancel()
@@ -144,11 +144,11 @@ class MataPelajaran extends Component
                 ];
             case "mapel":
                 return [
-                    'id_kelompok'  => 'required',
-                    'nama_mapel'   => 'required',
-                    'kode_mapel'   => 'required',
-                    'status'       => 'required',
-                    'no_urut'      => 'required',
+                    'id_kelompok'   => 'required',
+                    'nama_mapel'    => 'required',
+                    'kode_mapel'    => 'required',
+                    'status'        => 'required',
+                    'no_urut'       => 'required',
                 ];
             default:
                 return [];
@@ -199,14 +199,14 @@ class MataPelajaran extends Component
         }
         $this->dispatch('initSelect2');
     }
-    
+
     public function update($mode)
     {
         if ($this->dataId) {
             $this->validate($this->getValidationRule($mode));
-    
+
             $this->updateData($mode);
-    
+
             $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');
             $this->isEditing = false;
             $this->dataId = null;
@@ -256,8 +256,8 @@ class MataPelajaran extends Component
     {
         $this->dataId = $id;
         $this->dispatch('swal:confirm', [
-            'type'      => 'warning',  
-            'message'   => 'Are you sure?', 
+            'type'      => 'warning',
+            'message'   => 'Are you sure?',
             'text'      => 'If you delete the data, it cannot be restored!'
         ]);
         $this->deleteMode = $mode;
@@ -268,18 +268,22 @@ class MataPelajaran extends Component
         if ($this->deleteMode == "kelompok") {
             $data = KelompokMapel::findOrFail($this->dataId);
             $id_parent = $data->id;
-            KelompokMapel::where('id_parent', $id_parent)->delete(); $data->delete();
-            ModelsMataPelajaran::where('id_kelompok', $id_parent)->delete(); $data->delete();
+            KelompokMapel::where('id_parent', $id_parent)->delete();
+            $data->delete();
+            ModelsMataPelajaran::where('id_kelompok', $id_parent)->delete();
+            $data->delete();
         } else if ($this->deleteMode == "subkelompok") {
             $data = KelompokMapel::findOrFail($this->dataId);
-            $id_parent = $data->id; $data->delete();
-            ModelsMataPelajaran::where('id_kelompok', $id_parent)->delete(); $data->delete();
+            $id_parent = $data->id;
+            $data->delete();
+            ModelsMataPelajaran::where('id_kelompok', $id_parent)->delete();
+            $data->delete();
         } else if ($this->deleteMode == "mapel") {
             ModelsMataPelajaran::findOrFail($this->dataId)->delete();
         }
         $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
     }
-    
+
     public function active($id, $mode)
     {
         $mode == "active" ? ModelsMataPelajaran::findOrFail($id)->update(['status' => '1']) : ModelsMataPelajaran::findOrFail($id)->update(['status' => '0']);

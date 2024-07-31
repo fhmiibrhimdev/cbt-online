@@ -37,18 +37,18 @@ class User extends Component
         if ($this->searchTerm !== $this->previousSearchTerm) {
             $this->resetPage();
         }
-    
+
         $this->previousSearchTerm = $this->searchTerm;
     }
-    
+
     public function render()
     {
         $this->searchResetPage();
-        $search = '%'.$this->searchTerm.'%';
+        $search = '%' . $this->searchTerm . '%';
 
-        $data = ModelsUser::select('id', 'name', 'email', 'active')
-                    ->where('name', 'LIKE', $search)
-                    ->paginate($this->lengthData);
+        $data   = ModelsUser::select('id', 'name', 'email', 'active')
+            ->where('name', 'LIKE', $search)
+            ->paginate($this->lengthData);
 
         return view('livewire.control.user', compact('data'));
     }

@@ -8,7 +8,7 @@
             <div class="card">
                 <h3>Dashboard Content</h3>
                 <div class="card-body">
-                    <p class="tw-px-6">Welcome, your role is: user</p>
+                    <p class="tw-px-6">Welcome, your role is: Guru</p>
                 </div>
             </div>
         </div>

@@ -14,11 +14,13 @@ class Dashboard extends Component
     public function render()
     {
         $user = User::find(Auth::user()->id);
-        
-        if($user->hasRole('administrator')) {
+
+        if ($user->hasRole('administrator')) {
             return view('livewire.dashboard.dashboard-admin');
         } else if ($user->hasRole('guru')) {
-            return view('livewire.dashboard.dashboard-user');
+            return view('livewire.dashboard.dashboard-guru');
+        } else if ($user->hasRole('siswa')) {
+            return view('livewire.dashboard.dashboard-siswa');
         }
     }
 }

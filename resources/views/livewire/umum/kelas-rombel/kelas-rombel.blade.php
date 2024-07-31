@@ -37,24 +37,31 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($data as $row)
+                                @forelse ($data->groupBy('level') as $row)
                                     <tr>
-                                        <td class="text-center">{{ $loop->index + 1 }}</td>
-                                        <td class="text-center">{{ $row->nama_kelas }}</td>
-                                        <td class="text-center">{{ $row->kode_kelas }}</td>
-                                        <td>{{ $row->nama_jurusan }}</td>
-                                        <td class="text-center">Jansen Sibarani</td>
-                                        <td class="text-center">{{ $row->jumlah_siswa }}</td>
-                                        <td class="text-center">
-                                            <a class="btn btn-primary" href="{{ route('kelas-rombel-edit', $row->id) }}">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
-                                            <button wire:click.prevent="deleteConfirm({{ $row->id }})"
-                                                class="btn btn-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                        <td class="tw-text-base" colspan="7"> <b>Kelas: {{ $row[0]['level'] }}</b>
                                         </td>
                                     </tr>
+                                    @foreach ($row as $result)
+                                        <tr>
+                                            <td class="text-center">{{ $loop->index + 1 }}</td>
+                                            <td class="text-center">{{ $result['nama_kelas'] }}</td>
+                                            <td class="text-center">{{ $result['kode_kelas'] }}</td>
+                                            <td>{{ $result['nama_jurusan'] }}</td>
+                                            <td class="text-center">...</td>
+                                            <td class="text-center">{{ $result['jumlah_siswa'] }}</td>
+                                            <td class="text-center">
+                                                <a class="btn btn-primary"
+                                                    href="{{ route('kelas-rombel-edit', $result['id']) }}">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button wire:click.prevent="deleteConfirm({{ $result['id'] }})"
+                                                    class="btn btn-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
                                 @empty
                                     <tr>
                                         <td colspan="7" class="text-center">Not data available in the table</td>
@@ -69,8 +76,8 @@
                 </div>
             </div>
         </div>
-        <button class="btn-modal" data-toggle="modal" data-backdrop="static"
-        data-keyboard="false" data-target="#formDataModal">
+        <button class="btn-modal" data-toggle="modal" data-backdrop="static" data-keyboard="false"
+            data-target="#formDataModal">
             <i class="far fa-plus"></i>
         </button>
     </section>
@@ -105,7 +112,7 @@
                                     <select wire:model="id_jurusan" id="id_jurusan" class="form-control">
                                         <option value="" disabled>-- Opsi Pilihan --</option>
                                         @foreach ($jurusans as $jurusan)
-                                        <option value="{{ $jurusan->id }}">{{ $jurusan->nama_jurusan }}</option>
+                                            <option value="{{ $jurusan->id }}">{{ $jurusan->nama_jurusan }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -116,7 +123,7 @@
                                     <select wire:model="id_level" id="id_level" class="form-control">
                                         <option value="" disabled>-- Opsi Pilihan --</option>
                                         @foreach ($levels as $level)
-                                        <option value="{{ $level->id }}">{{ $level->level }}</option>
+                                            <option value="{{ $level->id }}">{{ $level->level }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -128,7 +135,8 @@
                             <div wire:ignore>
                                 <select multiple="multiple" id="my-select-searchable" wire:model="id_siswa">
                                     @foreach ($siswas as $siswa)
-                                    <option value='{{ $siswa->id }}'>{{ $siswa->nisn }} - {{ $siswa->nama_siswa }}</option>
+                                        <option value='{{ $siswa->id }}'>{{ $siswa->nisn }} -
+                                            {{ $siswa->nama_siswa }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -147,79 +155,81 @@
 </div>
 
 @push('general-css')
-<link rel="stylesheet" href="{{ asset('assets/multiselect/css/multi-select.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/multiselect/css/multi-select.css') }}">
 @endpush
 
 @push('js-libraries')
-<script src="{{ asset('assets/multiselect/js/jquery.quicksearch.js') }}"></script>
-<script src="{{ asset('assets/multiselect/js/jquery.multi-select.js') }}"></script>
+    <script src="{{ asset('assets/multiselect/js/jquery.quicksearch.js') }}"></script>
+    <script src="{{ asset('assets/multiselect/js/jquery.multi-select.js') }}"></script>
 @endpush
 
 @push('scripts')
-<script>
-    $(document).ready(function () {
-        let data = [];
+    <script>
+        $(document).ready(function() {
+            let data = [];
 
-        $('#my-select-searchable').multiSelect({
-            selectableHeader: "<div class='custom-header mb-2 tw-text-xs'>Semua Siswa</div><input type='text' class='search-input form-control mb-2' autocomplete='off' placeholder='Search here...'>",
-            selectionHeader: "<div class='custom-header mb-2 tw-text-xs'>Jumlah Siswa: <span id='selected-count'>0</span></div><input type='text' class='search-input form-control mb-2' autocomplete='off' placeholder='Search here...'>",
-            afterInit: function(ms) {
-                var that = this,
-                    $selectableSearch = that.$selectableUl.prev(),
-                    $selectionSearch = that.$selectionUl.prev(),
-                    selectableSearchString = '#' + that.$container.attr('id') + ' .ms-elem-selectable:not(.ms-selected)',
-                    selectionSearchString = '#' + that.$container.attr('id') + ' .ms-elem-selection.ms-selected';
+            $('#my-select-searchable').multiSelect({
+                selectableHeader: "<div class='custom-header mb-2 tw-text-xs'>Semua Siswa</div><input type='text' class='search-input form-control mb-2' autocomplete='off' placeholder='Search here...'>",
+                selectionHeader: "<div class='custom-header mb-2 tw-text-xs'>Jumlah Siswa: <span id='selected-count'>0</span></div><input type='text' class='search-input form-control mb-2' autocomplete='off' placeholder='Search here...'>",
+                afterInit: function(ms) {
+                    var that = this,
+                        $selectableSearch = that.$selectableUl.prev(),
+                        $selectionSearch = that.$selectionUl.prev(),
+                        selectableSearchString = '#' + that.$container.attr('id') +
+                        ' .ms-elem-selectable:not(.ms-selected)',
+                        selectionSearchString = '#' + that.$container.attr('id') +
+                        ' .ms-elem-selection.ms-selected';
 
-                that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
-                    .on('keydown', function(e) {
-                        if (e.which === 40) {
-                            that.$selectableUl.focus();
-                            return false;
-                        }
-                    });
+                    that.qs1 = $selectableSearch.quicksearch(selectableSearchString)
+                        .on('keydown', function(e) {
+                            if (e.which === 40) {
+                                that.$selectableUl.focus();
+                                return false;
+                            }
+                        });
 
-                that.qs2 = $selectionSearch.quicksearch(selectionSearchString)
-                    .on('keydown', function(e) {
-                        if (e.which == 40) {
-                            that.$selectionUl.focus();
-                            return false;
-                        }
-                    });
+                    that.qs2 = $selectionSearch.quicksearch(selectionSearchString)
+                        .on('keydown', function(e) {
+                            if (e.which == 40) {
+                                that.$selectionUl.focus();
+                                return false;
+                            }
+                        });
 
-                that.$container.addClass('w-auto');
-            },
-            afterSelect: function(values) {
-                this.qs1.cache();
-                this.qs2.cache();
-                $('#selected-count').text(countList);
-                updateSelectedCount(values, 'select');
-            },
-            afterDeselect: function(values) {
-                this.qs1.cache();
-                this.qs2.cache();
-                $('#selected-count').text(countList);
-                updateSelectedCount(values, 'deselect');
+                    that.$container.addClass('w-auto');
+                },
+                afterSelect: function(values) {
+                    this.qs1.cache();
+                    this.qs2.cache();
+                    $('#selected-count').text(countList);
+                    updateSelectedCount(values, 'select');
+                },
+                afterDeselect: function(values) {
+                    this.qs1.cache();
+                    this.qs2.cache();
+                    $('#selected-count').text(countList);
+                    updateSelectedCount(values, 'deselect');
+                }
+            });
+
+            function updateSelectedCount(values, method) {
+                if (method === "select") {
+                    data.push(values);
+                } else if (method === "deselect") {
+                    var indexToRemove = data.findIndex(item => JSON.stringify(item) === JSON.stringify(values));
+                    if (indexToRemove !== -1) {
+                        data.splice(indexToRemove, 1);
+                    }
+                }
+
+                @this.set('id_siswa', data)
+            }
+
+            function countList() {
+                var len = $('#my-select-searchable option:selected').length;
+                @this.set('jumlah_siswa', len)
+                return len
             }
         });
-
-        function updateSelectedCount(values, method) {
-            if (method === "select") {
-                data.push(values);
-            } else if (method === "deselect") {
-                var indexToRemove = data.findIndex(item => JSON.stringify(item) === JSON.stringify(values));
-                if (indexToRemove !== -1) {
-                    data.splice(indexToRemove, 1);
-                }
-            }
-            
-            @this.set('id_siswa', data)
-        }
-
-        function countList() {
-            var len = $('#my-select-searchable option:selected').length;
-            @this.set('jumlah_siswa', len)
-            return len
-        }
-    });
-</script>
+    </script>
 @endpush

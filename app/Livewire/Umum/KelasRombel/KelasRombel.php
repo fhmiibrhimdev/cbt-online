@@ -18,7 +18,7 @@ class KelasRombel extends Component
 {
     use WithPagination;
     #[Title('Kelas Rombel')]
-    
+
     protected $listeners = [
         'delete'
     ];
@@ -37,25 +37,25 @@ class KelasRombel extends Component
 
     public function mount()
     {
-        $this->levels = Level::get();
-        $this->jurusans = Jurusan::get();
+        $this->levels     = Level::get();
+        $this->jurusans   = Jurusan::get();
 
         $this->nama_kelas = '';
         $this->kode_kelas = '';
-        
-        $this->id_jurusan = '';
-        $this->id_level = '';
-        $this->id_guru = '';
 
-        $kelas_detail = KelasDetail::select('id_siswa')->get();
+        $this->id_jurusan = '';
+        $this->id_level   = '';
+        $this->id_guru    = '';
+
+        $kelas_detail      = KelasDetail::select('id_siswa')->get();
         $id_siswa_in_kelas = $kelas_detail->pluck('id_siswa')->toArray();
 
         if (empty($id_siswa_in_kelas)) {
             $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn')->get();
         } else {
             $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn')
-                        ->whereNotIn('id', $id_siswa_in_kelas)
-                        ->get();
+                ->whereNotIn('id', $id_siswa_in_kelas)
+                ->get();
         }
     }
 
@@ -69,19 +69,20 @@ class KelasRombel extends Component
         if ($this->searchTerm !== $this->previousSearchTerm) {
             $this->resetPage();
         }
-    
+
         $this->previousSearchTerm = $this->searchTerm;
     }
 
     public function render()
     {
         $this->searchResetPage();
-        $search = '%'.$this->searchTerm.'%';
+        $search = '%' . $this->searchTerm . '%';
 
-        $data = Kelas::select('kelas.id', 'kelas.nama_kelas', 'kelas.kode_kelas', 'kelas.jumlah_siswa', 'jurusan.nama_jurusan')
-                    ->join('jurusan', 'jurusan.id', 'kelas.id_jurusan')
-                    ->where('nama_kelas', 'LIKE', $search)
-                    ->paginate($this->lengthData);
+        $data = Kelas::select('kelas.id', 'kelas.nama_kelas', 'kelas.kode_kelas', 'kelas.jumlah_siswa', 'jurusan.nama_jurusan', 'level')
+            ->join('jurusan', 'jurusan.id', 'kelas.id_jurusan')
+            ->join('level', 'level.id', 'kelas.id_level')
+            ->where('nama_kelas', 'LIKE', $search)
+            ->paginate($this->lengthData);
 
         return view('livewire.umum.kelas-rombel.kelas-rombel', compact('data'));
     }
@@ -89,8 +90,8 @@ class KelasRombel extends Component
     private function dispatchAlert($type, $message, $text)
     {
         $this->dispatch('swal:modal', [
-            'type'      => $type,  
-            'message'   => $message, 
+            'type'      => $type,
+            'message'   => $message,
             'text'      => $text
         ]);
 
@@ -104,14 +105,14 @@ class KelasRombel extends Component
 
     private function resetInputFields()
     {
-        $this->nama_kelas = '';
-        $this->kode_kelas = '';
-        
-        $this->id_jurusan = '';
-        $this->id_level = '';
-        $this->id_guru = '';
+        $this->nama_kelas   = '';
+        $this->kode_kelas   = '';
 
-        $this->id_siswa = '';
+        $this->id_jurusan   = '';
+        $this->id_level     = '';
+        $this->id_guru      = '';
+
+        $this->id_siswa     = '';
         $this->jumlah_siswa = '';
     }
 
@@ -138,7 +139,7 @@ class KelasRombel extends Component
                 'id_guru'        => '0',
                 'jumlah_siswa'   => $this->jumlah_siswa,
             ]);
-            
+
             $kelasDetailData = [];
 
             foreach ($this->id_siswa as $siswa_id) {
@@ -163,8 +164,8 @@ class KelasRombel extends Component
     {
         $this->dataId = $id;
         $this->dispatch('swal:confirm', [
-            'type'      => 'warning',  
-            'message'   => 'Are you sure?', 
+            'type'      => 'warning',
+            'message'   => 'Are you sure?',
             'text'      => 'If you delete the data, it cannot be restored!'
         ]);
     }
@@ -175,6 +176,7 @@ class KelasRombel extends Component
             Kelas::findOrFail($this->dataId)->delete();
             KelasDetail::where('id_kelas', $this->dataId)->delete();
             Siswa::where('id_kelas', $this->dataId)->update(['status_kelas' => '0', 'id_kelas' => '0']);
+
             $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
             $this->dispatch('reloadPage');
         });
