@@ -2,12 +2,14 @@
 
 namespace App\Livewire\PelaksanaanUjian\Cetak;
 
+use Carbon\Carbon;
 use App\Models\Sesi;
 use App\Models\Ruang;
 use App\Models\Jadwal;
 use Livewire\Component;
 use App\Models\BankSoal;
 use App\Models\KopAbsensi;
+use App\Helpers\GlobalHelper;
 use App\Models\MataPelajaran;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
@@ -19,9 +21,13 @@ class AbsenPeserta extends Component
     public $id_ruanges = "0", $id_sesies = "0", $id_jadwales = "0";
     public $header_1, $header_2, $header_3, $header_4;
     public $ruangs, $sesis, $mapels, $nama_ruang, $nama_sesi, $nama_mapel, $waktu, $data, $hari_tanggal;
+    public $id_tp, $id_smt;
 
     public function mount($id_ruang = "0", $id_sesi = "0", $id_jadwal = "0")
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $data = KopAbsensi::findOrFail('1');
         $this->header_1  = $data->header_1;
         $this->header_2  = $data->header_2;
@@ -39,6 +45,7 @@ class AbsenPeserta extends Component
             $this->mapels = Jadwal::select('mata_pelajaran.id', 'mata_pelajaran.nama_mapel')
                 ->join('bank_soal', 'bank_soal.id', 'jadwal.id_bank')
                 ->join('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
+                ->where('jadwal.id_tp', $this->id_tp)
                 ->groupBy('mata_pelajaran.id', 'mata_pelajaran.nama_mapel')
                 ->get();
         } else {
@@ -55,7 +62,10 @@ class AbsenPeserta extends Component
             $jadwal = Jadwal::select('mata_pelajaran.nama_mapel', 'jadwal.tgl_mulai')
                 ->join('bank_soal', 'bank_soal.id', 'jadwal.id_bank')
                 ->join('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
-                ->where('mata_pelajaran.id', $id_jadwal)
+                ->where([
+                    ['mata_pelajaran.id', $id_jadwal],
+                    ['jadwal.id_tp', $this->id_tp],
+                ])
                 ->first();
 
             $this->nama_mapel   = $jadwal ? $jadwal->nama_mapel : null;
@@ -70,6 +80,9 @@ class AbsenPeserta extends Component
         $this->mapels  = Jadwal::select('mata_pelajaran.id', 'mata_pelajaran.nama_mapel')
             ->join('bank_soal', 'bank_soal.id', 'jadwal.id_bank')
             ->join('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
+            ->where([
+                ['jadwal.id_tp', $this->id_tp],
+            ])
             ->groupBy('mata_pelajaran.id', 'mata_pelajaran.nama_mapel')
             ->get();
 
@@ -101,7 +114,10 @@ class AbsenPeserta extends Component
         $jadwal = Jadwal::select('mata_pelajaran.nama_mapel', 'jadwal.tgl_mulai')
             ->join('bank_soal', 'bank_soal.id', 'jadwal.id_bank')
             ->join('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
-            ->where('mata_pelajaran.id', $value)
+            ->where([
+                ['mata_pelajaran.id', $value],
+                ['jadwal.id_tp', $this->id_tp],
+            ])
             ->first();
 
         $this->nama_mapel   = $jadwal ? $jadwal->nama_mapel : null;
@@ -139,7 +155,7 @@ class AbsenPeserta extends Component
             ->join('ruang', 'ruang.id', 'sesi_siswa.id_ruang')
             ->join('sesi', 'sesi.id', 'sesi_siswa.id_sesi')
             ->join('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
-            ->join('nomor_peserta', 'nomor_peserta.id_siswa', '=', 'siswa.id')
+            ->leftJoin('nomor_peserta', 'nomor_peserta.id_siswa', '=', 'siswa.id')
             ->when($id_jadwal, function ($query) use ($id_jadwal) {
                 return $query->where('mata_pelajaran.id', $id_jadwal);
             })
@@ -149,6 +165,7 @@ class AbsenPeserta extends Component
             ->when($id_sesi, function ($query) use ($id_sesi) {
                 return $query->where('sesi.id', $id_sesi);
             })
+            ->where('bank_soal.id_tp', $this->id_tp)
             ->orderBy('bank_soal.id', 'ASC')
             ->get();
     }

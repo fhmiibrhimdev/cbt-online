@@ -2,14 +2,15 @@
 
 namespace App\Livewire\Umum;
 
-use App\Models\KelasDetail;
-use App\Models\NomorPeserta;
 use App\Models\Role;
-use App\Models\RoleUser;
-use App\Models\SesiSiswa;
 use App\Models\User;
 use Livewire\Component;
+use App\Models\RoleUser;
+use App\Models\SesiSiswa;
+use App\Models\KelasDetail;
+use App\Models\NomorPeserta;
 use Livewire\WithPagination;
+use App\Helpers\GlobalHelper;
 use Livewire\Attributes\Title;
 use App\Models\Siswa as ModelsSiswa;
 use Illuminate\Support\Facades\Hash;
@@ -38,10 +39,14 @@ class Siswa extends Component
     public $dataId, $id_user, $nama_siswa, $nis, $nisn, $jk, $kelas, $tahun_masuk, $sekolah_asal, $status,
         $tempat_lahir, $tgl_lahir, $agama, $alamat, $rt, $rw, $kelurahan_desa, $kecamatan, $kabupaten_kota, $kode_pos, $no_hp,
         $status_keluarga, $anak_ke, $nama_ayah, $pekerjaan_ayah, $alamat_ayah, $nohp_ayah, $nama_ibu, $pekerjaan_ibu, $alamat_ibu, $nohp_ibu,
-        $nama_wali, $pekerjaan_wali, $alamat_wali, $nohp_wali;
+        $nama_wali, $pekerjaan_wali, $alamat_wali, $nohp_wali, $filter = "1";
+
+    public $id_tp, $id_smt;
 
     public function mount()
     {
+        $this->id_tp           = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt          = GlobalHelper::getActiveSemesterId();
         $this->id_user         = '';
         $this->nama_siswa      = '';
         $this->nis             = '';
@@ -97,14 +102,22 @@ class Siswa extends Component
         $this->searchResetPage();
         $search = '%' . $this->searchTerm . '%';
 
-        $data   = ModelsSiswa::select('siswa.id', 'nama_siswa', 'nis', 'nisn', 'jk', 'nama_kelas')
+        $data   = ModelsSiswa::select('siswa.id', 'nama_siswa', 'nis', 'nisn', 'jk', 'nama_kelas', 'level')
+            ->leftJoin('kelas', 'kelas.id', 'siswa.id_kelas')
+            ->leftJoin('level', 'level.id', 'kelas.id_level')
             ->where(function ($query) use ($search) {
                 $query->where('nama_siswa', 'LIKE', $search);
                 $query->orWhere('nis', 'LIKE', $search);
                 $query->orWhere('nisn', 'LIKE', $search);
                 $query->orWhere('jk', 'LIKE', $search);
             })
-            ->leftJoin('kelas', 'kelas.id', 'siswa.id_kelas')
+            ->where('siswa.id_tp', $this->id_tp)
+            ->when($this->filter == "1", function ($query) {
+                $query->where('siswa.id_kelas', '>', 0);
+            })
+            ->when($this->filter == "2", function ($query) {
+                $query->where('siswa.id_kelas', '=', 0);
+            })
             ->paginate($this->lengthData);
 
         return view('livewire.umum.siswa', compact('data'));
@@ -150,6 +163,8 @@ class Siswa extends Component
         $user->addRole('siswa');
 
         ModelsSiswa::create([
+            'id_tp'       => $this->id_tp,
+            'id_smt'      => $this->id_smt,
             'id_user'     => $user->id,
             'nama_siswa'  => $this->nama_siswa,
             'nis'         => $this->nis,
@@ -219,6 +234,8 @@ class Siswa extends Component
             ]);
 
             $siswa->update([
+                'id_tp'           => $this->id_tp,
+                'id_smt'          => $this->id_smt,
                 'nama_siswa'      => $this->nama_siswa,
                 'nis'             => $this->nis,
                 'nisn'            => $this->nisn,

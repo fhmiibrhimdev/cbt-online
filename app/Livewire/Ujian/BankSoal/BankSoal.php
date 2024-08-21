@@ -3,18 +3,20 @@
 namespace App\Livewire\Ujian\BankSoal;
 
 use App\Models\Guru;
+use App\Models\Soal;
 use App\Models\Kelas;
 use App\Models\Level;
+use App\Models\Jadwal;
 use Livewire\Component;
 use App\Models\Semester;
 use Livewire\WithPagination;
+use App\Helpers\GlobalHelper;
 use App\Models\MataPelajaran;
 use App\Models\TahunPelajaran;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 use App\Models\BankSoal as ModelsBankSoal;
-use App\Models\Soal;
 
 class BankSoal extends Component
 {
@@ -22,7 +24,8 @@ class BankSoal extends Component
     #[Title('Bank Soal')]
 
     protected $listeners = [
-        'delete'
+        'delete',
+        'replicate'
     ];
     protected $rules = [
         'id_mapel' => 'required',
@@ -47,6 +50,9 @@ class BankSoal extends Component
 
     public function mount()
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $this->mapels = MataPelajaran::select('id', 'nama_mapel')->where('status', '1')->get();
         $this->levels = Level::select('id', 'level')->get();
         $this->dispatch('initSelect2');
@@ -64,9 +70,12 @@ class BankSoal extends Component
         $this->kelass   = [];
 
         $this->gurus = Guru::select('guru.id', 'nama_guru')
-            ->join('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
-            ->join('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
-            ->where('jabatan_guru_detail.id_mapel', $this->id_mapel)
+            ->leftJoin('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
+            ->leftJoin('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
+            ->where([
+                ['jabatan_guru_detail.id_mapel', $this->id_mapel],
+                ['guru.id_tp', $this->id_tp],
+            ])
             ->distinct()
             ->get()
             ->toArray();
@@ -77,15 +86,22 @@ class BankSoal extends Component
     public function updatedIdGuru()
     {
         $arr_id_kelas = Guru::select('jabatan_guru_detail.id_kelas')
-            ->join('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
-            ->join('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
+            ->leftJoin('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
+            ->leftJoin('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
             ->where([
                 ['jabatan_guru_detail.id_mapel', $this->id_mapel],
                 ['guru.id', $this->id_guru]
             ])
             ->pluck('jabatan_guru_detail.id_kelas');
 
-        $this->kelass = DB::table('kelas')->select('kelas.id', 'kode_kelas', 'level')->join('level', 'level.id', 'kelas.id_level')->whereIn('kelas.id', $arr_id_kelas)->get();
+        $this->kelass = DB::table('kelas')->select('kelas.id', 'kode_kelas', 'level')
+            ->leftJoin('level', 'level.id', 'kelas.id_level')
+            ->where('kelas.id_tp', $this->id_tp)
+            ->whereIn('kelas.id', $arr_id_kelas)
+            ->get()
+            ->groupBy('level');
+
+        // dd($this->kelass);
 
         $this->initSelect2();
     }
@@ -132,14 +148,24 @@ class BankSoal extends Component
             'mata_pelajaran.kode_mapel',
             'nama_guru',
             DB::raw("(jml_pg + jml_esai + jml_kompleks + jml_jodohkan + jml_isian) as total_seharusnya"),
-            DB::raw("(tampil_pg + tampil_esai + tampil_kompleks + tampil_jodohkan + tampil_isian) as total_ditampilkan")
+            DB::raw("(tampil_pg + tampil_esai + tampil_kompleks + tampil_jodohkan + tampil_isian) as total_ditampilkan"),
+            DB::raw("IFNULL(COUNT(jadwal.id), 0) as jadwal_count"),
+            DB::raw("IFNULL(COUNT(nilai_soal_siswa.id), 0) as nilai_count")
         )
             ->leftJoin('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
             ->leftJoin('guru', 'guru.id', 'bank_soal.id_guru')
+            // ->leftJoin('jadwal', 'jadwal.id_bank', 'bank_soal.id')
+            ->leftJoin('jadwal', function ($join) {
+                $join->on('jadwal.id_bank', '=', 'bank_soal.id')
+                    ->where('jadwal.status', '=', '1');
+            })
+            ->leftJoin('nilai_soal_siswa', 'nilai_soal_siswa.id_jadwal', 'jadwal.id')
             ->where(function ($query) use ($search) {
                 $query->where('bank_soal.kode_bank', 'LIKE', $search);
                 $query->orWhere('mata_pelajaran.nama_mapel', 'LIKE', $search);
             })
+            ->where('bank_soal.id_tp', $this->id_tp)
+            ->groupBy('bank_soal.id', 'kode_bank', 'id_kelas', 'mata_pelajaran.nama_mapel', 'mata_pelajaran.kode_mapel', 'guru.nama_guru')
             ->paginate($this->lengthData);
 
         return view('livewire.ujian.bank-soal.bank-soal', compact('data'));
@@ -170,8 +196,6 @@ class BankSoal extends Component
         $this->id_kelas        = [];
         $this->id_mapel        = '';
         $this->id_guru         = '';
-        $this->id_tp           = '';
-        $this->id_smt          = '';
 
         $this->jml_pg          = '0';
         $this->jml_esai        = '0';
@@ -276,23 +300,30 @@ class BankSoal extends Component
         $this->status_soal    = $data->status_soal;
 
         $this->gurus = Guru::select('guru.id', 'nama_guru')
-            ->join('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
-            ->join('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
+            ->leftJoin('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
+            ->leftJoin('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
             ->where('jabatan_guru_detail.id_mapel', $this->id_mapel)
             ->distinct()
             ->get()
             ->toArray();
 
         $arr_id_kelas = Guru::select('jabatan_guru_detail.id_kelas')
-            ->join('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
-            ->join('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
+            ->leftJoin('jabatan_guru', 'jabatan_guru.id_guru', 'guru.id')
+            ->leftJoin('jabatan_guru_detail', 'jabatan_guru_detail.id_jabatan_guru', 'jabatan_guru.id')
             ->where([
                 ['jabatan_guru_detail.id_mapel', $this->id_mapel],
                 ['guru.id', $this->id_guru]
             ])
             ->pluck('jabatan_guru_detail.id_kelas');
 
-        $this->kelass    = DB::table('kelas')->select('kelas.id', 'kode_kelas', 'level')->join('level', 'level.id', 'kelas.id_level')->whereIn('kelas.id', $arr_id_kelas)->get();
+        $this->kelass    = DB::table('kelas')->select('kelas.id', 'kode_kelas', 'level')
+            ->leftJoin('level', 'level.id', 'kelas.id_level')
+            ->whereIn('kelas.id', $arr_id_kelas)
+            ->where([
+                ['kelas.id_tp', $this->id_tp],
+            ])
+            ->get()
+            ->groupBy('level');
 
         $kode_mapel      = MataPelajaran::select('id', 'kode_mapel')->where('id', $this->id_mapel)->first()->kode_mapel;
         $level           = Level::select('level')->where('id', $this->id_level)->first()->level;
@@ -313,6 +344,9 @@ class BankSoal extends Component
         if ($this->dataId) {
             ModelsBankSoal::findOrFail($this->dataId)->update([
                 'kode_bank'       => $this->kode_bank,
+
+                'id_tp'        => $this->id_tp,
+                'id_smt'        => $this->id_smt,
 
                 'id_level'        => $this->id_level,
                 'id_kelas'        => implode(',', $this->id_kelas),
@@ -358,6 +392,39 @@ class BankSoal extends Component
     {
         ModelsBankSoal::findOrFail($this->dataId)->delete();
         Soal::where('id_bank', $this->dataId)->delete();
+        Jadwal::where('id_bank', $this->dataId)->delete();
         $this->dispatchAlert('success', 'Success!', 'Data deleted successfully.');
+    }
+
+    public function replicatedConfirm($id)
+    {
+        $this->dataId = $id;
+        $this->dispatch('swal:replicatedConfirm', [
+            'type'      => 'warning',
+            'message'   => 'Perhatian!',
+            'text'      => 'Apa anda yakin ingin mengcopy data tersebut?'
+        ]);
+    }
+
+    public function replicate()
+    {
+        $bank_soal = ModelsBankSoal::find($this->dataId);
+
+        if ($bank_soal) {
+            $new_bank_soal = $bank_soal->replicate();
+            $new_bank_soal->save();
+
+            $soals = Soal::where('id_bank', $this->dataId)->get();
+            foreach ($soals as $soal) {
+                $newSoal = $soal->replicate();
+                $newSoal->id_bank = $new_bank_soal->id;
+                $newSoal->save();
+            }
+            $this->dispatchAlert('success', 'Success!', 'Data berhasil dicopy.');
+        } else {
+            $this->dispatchAlert('success', 'Success!', 'Data tidak ditemukan.');
+        }
+
+        $this->dataId = null;
     }
 }

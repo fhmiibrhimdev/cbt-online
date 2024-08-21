@@ -349,10 +349,13 @@
                                                     <select wire:model.live="id_kelas" id="id_kelas"
                                                         class="form-control">
                                                         <option value="0" disabled>-- Opsi Pilihan --</option>
-                                                        @foreach ($kelas as $kela)
-                                                            <optgroup label="{{ $kela->level }}">
-                                                                <option value="{{ $kela->id }}">
-                                                                    {{ $kela->kode_kelas }}</option>
+                                                        @foreach ($kelas as $level => $kelasGroup)
+                                                            <optgroup label="{{ $level }}">
+                                                                @foreach ($kelasGroup as $kelasItem)
+                                                                    <option value="{{ $kelasItem->id }}">
+                                                                        {{ $level }}-{{ $kelasItem->kode_kelas }}
+                                                                    </option>
+                                                                @endforeach
                                                             </optgroup>
                                                         @endforeach
                                                     </select>
@@ -399,10 +402,13 @@
                                                     <select wire:model="id_mapel_kelas.{{ $mapel->id }}"
                                                         id="id_mapel_kelas_{{ $mapel->id }}" class="form-control"
                                                         multiple>
-                                                        @foreach ($kelas as $kela)
-                                                            <optgroup label="{{ $kela->level }}">
-                                                                <option value="{{ $kela->id }}">
-                                                                    {{ $kela->kode_kelas }}</option>
+                                                        @foreach ($kelas as $level => $kelasGroup)
+                                                            <optgroup label="{{ $level }}">
+                                                                @foreach ($kelasGroup as $kelasItem)
+                                                                    <option value="{{ $kelasItem->id }}">
+                                                                        {{ $level }}-{{ $kelasItem->kode_kelas }}
+                                                                    </option>
+                                                                @endforeach
                                                             </optgroup>
                                                         @endforeach
                                                     </select>

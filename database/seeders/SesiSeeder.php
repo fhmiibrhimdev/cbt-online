@@ -35,6 +35,13 @@ class SesiSeeder extends Seeder
                 'waktu_akhir'   => '12:00',
                 'active'        => '1',
             ],
+            [
+                'nama_sesi'     => 'Sesi 4',
+                'kode_sesi'     => 'S4',
+                'waktu_mulai'   => '00:00',
+                'waktu_akhir'   => '23:59',
+                'active'        => '1',
+            ],
         ];
 
         Sesi::insert($data);

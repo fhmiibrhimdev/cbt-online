@@ -16,11 +16,14 @@
                                 <label for="id_kelas">Kelas</label>
                                 <div wire:ignore>
                                     <select wire:model="id_kelas" id="id_kelas" class="form-control select2">
-                                        <option value="">-- Pilih Kelas --</option>
-                                        @foreach ($kelass as $kelas)
-                                            <optgroup label="{{ $kelas->level }}">
-                                                <option value="{{ $kelas->id }}">{{ $kelas->level }} -
-                                                    {{ $kelas->kode_kelas }}</option>
+                                        <option value="" disabled>-- Pilih Kelas --</option>
+                                        @foreach ($kelass as $level => $kelasGroup)
+                                            <optgroup label="{{ $level }}">
+                                                @foreach ($kelasGroup as $kelasItem)
+                                                    <option value="{{ $kelasItem->id }}">
+                                                        {{ $level }}-{{ $kelasItem->kode_kelas }}
+                                                    </option>
+                                                @endforeach
                                             </optgroup>
                                         @endforeach
                                     </select>
@@ -33,7 +36,7 @@
                                     <label for="all_id_ruang">Ruang:</label>
                                     <div wire:ignore>
                                         <select wire:model="id_ruang" id="all_id_ruang" class="form-control select2">
-                                            <option value="">-- Pilih Ruang --</option>
+                                            <option value="0">-- Pilih Ruang --</option>
                                             @foreach ($ruangs as $ruang)
                                                 <option value="{{ $ruang->id }}">{{ $ruang->kode_ruang }}</option>
                                             @endforeach
@@ -46,7 +49,7 @@
                                     <label for="all_id_sesi">Sesi:</label>
                                     <div wire:ignore>
                                         <select wire:model="id_sesi" id="all_id_sesi" class="form-control select2">
-                                            <option value="">-- Pilih Sesi --</option>
+                                            <option value="0">-- Pilih Sesi --</option>
                                             @foreach ($sesis as $sesi)
                                                 <option value="{{ $sesi->id }}">{{ $sesi->nama_sesi }}</option>
                                             @endforeach
@@ -74,7 +77,7 @@
                                         <td>{{ $siswa->nama_siswa }}</td>
                                         <td class="text-center">{{ $siswa->level }} - {{ $siswa->kode_kelas }}</td>
                                         <td>
-                                            <div wire:ignore>
+                                            <div wire:ignore wire:key="{{ rand() }}">
                                                 <select wire:model="data.{{ $siswa->id }}.id_ruang"
                                                     id="id_ruang_{{ $siswa->id }}" class="form-control">
                                                     <option value="0">-- Pilih Ruang --</option>
@@ -86,7 +89,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div wire:ignore>
+                                            <div wire:ignore wire:key="{{ rand() }}">
                                                 <select wire:model="data.{{ $siswa->id }}.id_sesi"
                                                     id="id_sesi_{{ $siswa->id }}" class="form-control">
                                                     <option value="0">-- Pilih Sesi --</option>
@@ -134,7 +137,7 @@
                     var id = $(this).attr('id');
                     var data = $(this).select2("val");
                     @this.set(id, data);
-                    window.location.href = "{{ url('/ujian/atur-ruang') }}" + "/" + data
+                    // window.location.href = "{{ url('/ujian/atur-ruang') }}" + "/" + data
                 });
 
                 $('#all_id_ruang').select2();

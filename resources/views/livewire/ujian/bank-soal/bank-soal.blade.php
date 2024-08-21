@@ -8,8 +8,14 @@
             <div class="tw-border-l-4 tw-border-blue-500 tw-bg-blue-100 tw-p-4 tw-mb-4 tw-rounded-lg">
                 <h4 class="tw-text-blue-700 tw-font-bold tw-mb-2"><i class="fas fa-exclamation-circle"></i> Informasi
                 </h4>
-                <p class="tw-text-blue-700"><i class="fas fa-badge-check tw-text-green-700"></i> : Bank
+                <p class="tw-text-blue-700"><i class="fas fa-badge-check tw-text-base tw-text-green-700"></i> : Bank
                     Soal sudah siap digunakan</p>
+                <p class="tw-text-blue-700"><span class="tw-bg-gray-400 tw-px-2 tw-rounded-sm mr-1"></span> : Tidak
+                    digunakan (bisa dihapus)</p>
+                <p class="tw-text-blue-700"><span class="tw-bg-yellow-400 tw-px-2 tw-rounded-sm mr-1"></span> :
+                    Digunakan jadwal (tidak bisa dihapus)</p>
+                <p class="tw-text-blue-700"><span class="tw-bg-purple-400 tw-px-2 tw-rounded-sm mr-1"></span> :
+                    Digunakan siswa (tidak bisa dihapus)</p>
             </div>
             <div class="card">
                 <h3>Table Bank Soal</h3>
@@ -46,6 +52,13 @@
                                     <tr>
                                         <td class="text-center">{{ $loop->index + 1 }}</td>
                                         <td>
+                                            @if ($row->jadwal_count == 0 && $row->nilai_count == 0)
+                                                <span class="tw-bg-gray-400 tw-px-2 tw-rounded-sm mr-1"></span>
+                                            @elseif ($row->jadwal_count > 0 && $row->nilai_count == 0)
+                                                <span class="tw-bg-yellow-400 tw-px-2 tw-rounded-sm mr-1"></span>
+                                            @elseif ($row->jadwal_count > 0 && $row->nilai_count > 0)
+                                                <span class="tw-bg-purple-400 tw-px-2 tw-rounded-sm mr-1"></span>
+                                            @endif
                                             {{ $row->kode_bank }}
                                             @if ($row->total_seharusnya == $row->total_ditampilkan)
                                                 <i class="fas fa-badge-check tw-text-base tw-text-green-600"></i>
@@ -61,7 +74,8 @@
                                             @endforeach
 
                                             @if ($row->getKelas()->count() > 2)
-                                                <button id="kelas-toggle" data-id="{{ $row->id }}">
+                                                <button id="kelas-toggle" data-id="{{ $row->id }}"
+                                                    class="tw-mt-2.5">
                                                     <span
                                                         class="tw-bg-purple-50 tw-text-xs tw-tracking-wider tw-text-purple-600 tw-px-2.5 tw-py-1.5 tw-rounded-lg tw-font-semibold mt-1">...</span>
                                                 </button>
@@ -76,19 +90,31 @@
                                             @endif
                                         </td>
                                         <td class="text-center">
-                                            <a href="{{ route('bank-soal-detail', [Crypt::encrypt($row->id), 1]) }}"
-                                                class="btn btn-success" title="Buat Soal">
-                                                <i class="fas fa-plus"></i>
-                                            </a>
-                                            <button wire:click.prevent="edit({{ $row->id }})"
-                                                class="btn btn-primary" data-toggle="modal" data-target="#formDataModal"
-                                                title="Edit Data">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button wire:click.prevent="deleteConfirm({{ $row->id }})"
-                                                class="btn btn-danger" title="Delete Data">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+
+                                            @if ($row->jadwal_count == 0 && $row->nilai_count == 0)
+                                                <a href="{{ route('bank-soal-detail', [Crypt::encrypt($row->id), 1]) }}"
+                                                    class="btn btn-success" title="Buat Soal">
+                                                    <i class="fas fa-plus"></i>
+                                                </a>
+                                                <button wire:click.prevent="edit({{ $row->id }})"
+                                                    class="btn btn-primary" data-toggle="modal"
+                                                    data-target="#formDataModal" title="Edit Data">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button wire:click.prevent="deleteConfirm({{ $row->id }})"
+                                                    class="btn btn-danger" title="Delete Data">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            @else
+                                                <button wire:click.prevent="replicatedConfirm({{ $row->id }})"
+                                                    class="btn btn-warning" title="Replicate Data">
+                                                    <i class="fas fa-copy"></i>
+                                                </button>
+                                                <a href="{{ route('bank-soal-detail', [Crypt::encrypt($row->id), 1]) }}"
+                                                    class="btn btn-primary" title="Buat Soal">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -115,7 +141,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="formDataModalLabel">{{ $isEditing ? 'Edit Data' : 'Add Data' }}</h5>
-                    <button type="button" wire:click="cancel()" class="close" data-dismiss="modal" aria-label="Close">
+                    <button type="button" wire:click="cancel()" class="close" data-dismiss="modal"
+                        aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -203,11 +230,14 @@
                                     <select wire:model="id_kelas" id="id_kelas" class="form-control" multiple
                                         {{ empty($kelass) || $id_level == '' ? 'disabled' : '' }}>
                                         <option value="">-- Opsi Pilihan --</option>
-                                        @foreach ($kelass as $kelas)
-                                            <optgroup label="{{ $kelas->level }}">
-                                                <option value="{{ $kelas->id }}"
-                                                    {{ in_array($kelas->id, $id_kelas) ? 'selected' : '' }}>
-                                                    {{ $kelas->level }}-{{ $kelas->kode_kelas }}</option>
+                                        @foreach ($kelass as $level => $kelasGroup)
+                                            <optgroup label="{{ $level }}">
+                                                @foreach ($kelasGroup as $kelasItem)
+                                                    <option value="{{ $kelasItem->id }}"
+                                                        {{ in_array($kelasItem->id, $id_kelas) ? 'selected' : '' }}>
+                                                        {{ $level }}-{{ $kelasItem->kode_kelas }}
+                                                    </option>
+                                                @endforeach
                                             </optgroup>
                                         @endforeach
                                     </select>
@@ -229,7 +259,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="jml_pg">Jumlah Soal</label>
-                                                <input type="number" wire:model.live="jml_pg" id="jml_pg"
+                                                <input type="number" wire:model.blur="jml_pg" id="jml_pg"
                                                     class="form-control">
                                                 @error('jml_pg')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -239,7 +269,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="bobot_pg">Bobot (%)</label>
-                                                <input type="text" wire:model.live="bobot_pg" id="bobot_pg"
+                                                <input type="text" wire:model.blur="bobot_pg" id="bobot_pg"
                                                     class="form-control">
                                                 @error('bobot_pg')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -274,7 +304,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="jml_kompleks">Jumlah Soal</label>
-                                                <input type="number" wire:model.live="jml_kompleks"
+                                                <input type="number" wire:model.blur="jml_kompleks"
                                                     id="jml_kompleks" class="form-control">
                                                 @error('jml_kompleks')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -284,7 +314,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="bobot_kompleks">Bobot (%)</label>
-                                                <input type="number" wire:model.live="bobot_kompleks"
+                                                <input type="number" wire:model.blur="bobot_kompleks"
                                                     id="bobot_kompleks" class="form-control">
                                                 @error('bobot_kompleks')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -305,7 +335,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="jml_jodohkan">Jumlah Soal</label>
-                                                <input type="number" wire:model.live="jml_jodohkan"
+                                                <input type="number" wire:model.blur="jml_jodohkan"
                                                     id="jml_jodohkan" class="form-control">
                                                 @error('jml_jodohkan')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -315,7 +345,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="bobot_jodohkan">Bobot (%)</label>
-                                                <input type="number" wire:model.live="bobot_jodohkan"
+                                                <input type="number" wire:model.blur="bobot_jodohkan"
                                                     id="bobot_jodohkan" class="form-control">
                                                 @error('bobot_jodohkan')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -336,7 +366,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="jml_isian">Jumlah Soal</label>
-                                                <input type="number" wire:model.live="jml_isian" id="jml_isian"
+                                                <input type="number" wire:model.blur="jml_isian" id="jml_isian"
                                                     class="form-control">
                                                 @error('jml_isian')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -346,7 +376,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="bobot_isian">Bobot (%)</label>
-                                                <input type="number" wire:model.live="bobot_isian" id="bobot_isian"
+                                                <input type="number" wire:model.blur="bobot_isian" id="bobot_isian"
                                                     class="form-control">
                                                 @error('bobot_isian')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -367,7 +397,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="jml_esai">Jumlah Soal</label>
-                                                <input type="number" wire:model.live="jml_esai" id="jml_esai"
+                                                <input type="number" wire:model.blur="jml_esai" id="jml_esai"
                                                     class="form-control">
                                                 @error('jml_esai')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -377,7 +407,7 @@
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label for="bobot_esai">Bobot (%)</label>
-                                                <input type="number" wire:model.live="bobot_esai" id="bobot_esai"
+                                                <input type="number" wire:model.blur="bobot_esai" id="bobot_esai"
                                                     class="form-control">
                                                 @error('bobot_esai')
                                                     <small class='text-danger'>{{ $message }}</small>
@@ -410,6 +440,20 @@
 @endpush
 
 @push('scripts')
+    <script>
+        window.addEventListener('swal:replicatedConfirm', event => {
+            Swal.fire({
+                title: event.detail[0].message,
+                text: event.detail[0].text,
+                icon: event.detail[0].type,
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Livewire.dispatch('replicate')
+                }
+            })
+        })
+    </script>
     <script>
         $(document).ready(function() {
             $(document).on('click', '#kelas-toggle', function() {

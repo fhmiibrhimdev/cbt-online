@@ -15,10 +15,12 @@ class Ujian extends Component
 {
     #[Title('Ujian')]
     public $jadwals = [];
-    public $siswa;
+    public $siswa, $id_siswa;
 
     public function mount()
     {
+        $this->id_siswa = Siswa::where('id_user', Auth::user()->id)->first()->id;
+
         $this->siswa = Siswa::select('nomor_peserta', 'nama_ruang', 'nama_sesi', 'waktu_mulai', 'waktu_akhir')
             ->leftJoin('sesi_siswa', 'sesi_siswa.id_siswa', 'siswa.id')
             ->leftJoin('ruang', 'ruang.id', 'sesi_siswa.id_ruang')
@@ -42,15 +44,15 @@ class Ujian extends Component
             ->leftJoin('jenis_ujian', 'jenis_ujian.id', 'jadwal.id_jenis_ujian')
             ->leftJoin('nilai_soal_siswa', function ($join) {
                 $join->on('nilai_soal_siswa.id_jadwal', '=', 'jadwal.id')
-                    ->where('nilai_soal_siswa.id_siswa', '=', Auth::user()->id);
+                    ->where('nilai_soal_siswa.id_siswa', '=', $this->id_siswa);
             })
             ->leftJoin('kelas', DB::raw('FIND_IN_SET(kelas.id, bank_soal.id_kelas)'), '>', DB::raw('0'))
             ->leftJoin('siswa', 'siswa.id_kelas', 'kelas.id')
             ->where([
-                ['tgl_mulai', date('Y-m-d')],
                 ['siswa.id_user', Auth::user()->id],
                 ['jadwal.status', '1'],
-            ])->get();
+            ])
+            ->get();
 
         // dd($this->jadwals);
     }

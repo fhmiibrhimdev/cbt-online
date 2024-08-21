@@ -74,7 +74,7 @@
                                         class="tw-tracking-normal tw-py-2 tw-px-3 tw-text-gray-900 tw-text-lg tw-bg-white tw-border tw-border-black">
                                         No
                                     </th>
-                                    <th width="23%"
+                                    <th width="31%"
                                         class="tw-tracking-normal tw-py-2 tw-px-3 tw-text-gray-900 tw-text-lg tw-bg-white tw-border tw-border-black">
                                         No.
                                         Peserta</th>

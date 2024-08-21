@@ -9,6 +9,7 @@ use App\Models\Semester;
 use App\Models\SesiSiswa;
 use App\Models\JenisUjian;
 use Livewire\WithPagination;
+use App\Helpers\GlobalHelper;
 use App\Models\TahunPelajaran;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
@@ -26,11 +27,16 @@ class Pengawas extends Component
     public $isEditing = false;
 
     public $dataId, $title;
+    public $id_tp, $id_smt;
+
 
     public function mount()
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $this->ujians = JenisUjian::get();
-        $this->gurus = Guru::select('id', 'nama_guru')->get();
+        $this->gurus = Guru::select('id', 'nama_guru')->where('id_tp', $this->id_tp)->get();
         $this->intialData();
         $this->initSelect2();
     }
@@ -38,8 +44,11 @@ class Pengawas extends Component
     private function intialData()
     {
         $pengawas = ModelsPengawas::select('pengawas.*')
-            ->where('id_jenis_ujian', $this->id_jenis_ujian)
             ->join('jadwal', 'jadwal.id', 'pengawas.id_jadwal')
+            ->where([
+                ['id_jenis_ujian', $this->id_jenis_ujian],
+                ['pengawas.id_tp', $this->id_tp],
+            ])
             ->get();
         $this->selectedGurus = [];
 
@@ -75,12 +84,16 @@ class Pengawas extends Component
             ->join('ruang', 'ruang.id', 'sesi_siswa.id_ruang')
             ->distinct()
             ->orderBy('sesi_siswa.id_kelas')
+            ->where('id_tp', $this->id_tp)
             ->get();
 
         $dataJadwals = Jadwal::select('jadwal.id', 'bank_soal.id_kelas', 'bank_soal.kode_bank', 'nama_mapel', 'jadwal.tgl_mulai')
             ->join('bank_soal', 'bank_soal.id', 'jadwal.id_bank')
             ->join('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
-            ->where('id_jenis_ujian', $this->id_jenis_ujian)
+            ->where([
+                ['id_jenis_ujian', $this->id_jenis_ujian],
+                ['jadwal.id_tp', $this->id_tp],
+            ])
             ->orderBy('jadwal.tgl_mulai', 'DESC')
             // ->orderBy('nama_mapel', 'DESC')
             ->get();
@@ -119,9 +132,6 @@ class Pengawas extends Component
 
         $processedJadwals = [];
 
-        $id_tp      = TahunPelajaran::where('active', '1')->first()->id;
-        $id_smt     = Semester::where('active', '1')->first()->id;
-
         DB::transaction(function () use ($formattedData, &$processedJadwals, &$id_tp, &$id_smt) {
             foreach ($this->formattedData['id_jadwal'] as $jadwalId => $ruangData) {
                 foreach ($ruangData['id_ruang'] as $ruangId => $sesiData) {
@@ -132,8 +142,8 @@ class Pengawas extends Component
                             ModelsPengawas::updateOrCreate(
                                 [
                                     'id_jadwal' => $jadwalId,
-                                    'id_tp'     => $id_tp,
-                                    'id_smt'    => $id_smt,
+                                    'id_tp'     => $this->id_tp,
+                                    'id_smt'    => $this->id_smt,
                                     'id_ruang'  => $ruangId,
                                     'id_sesi'   => $sesiId,
                                 ],
@@ -143,8 +153,8 @@ class Pengawas extends Component
                             // Tambahkan jadwal yang diproses ke array
                             $processedJadwals[] = [
                                 'id_jadwal' => $jadwalId,
-                                'id_tp'     => $id_tp,
-                                'id_smt'    => $id_smt,
+                                'id_tp'     => $this->id_tp,
+                                'id_smt'    => $this->id_smt,
                                 'id_ruang'  => $ruangId,
                                 'id_sesi'   => $sesiId,
                             ];

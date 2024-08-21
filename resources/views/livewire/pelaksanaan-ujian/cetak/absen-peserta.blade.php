@@ -171,11 +171,11 @@
                                         <table class="tw-border tw-border-black" border="1">
                                             <thead>
                                                 <tr class="tw-border tw-border-black tw-text-center">
-                                                    <th width="8%"
+                                                    <th width="9%"
                                                         class="tw-tracking-normal tw-py-2 tw-px-3 tw-text-xs tw-bg-white tw-border tw-border-black">
                                                         No
                                                     </th>
-                                                    <th width="20%"
+                                                    <th width="32%"
                                                         class="tw-tracking-normal tw-py-2 tw-px-3 tw-text-xs tw-bg-white tw-border tw-border-black">
                                                         No.
                                                         Peserta</th>

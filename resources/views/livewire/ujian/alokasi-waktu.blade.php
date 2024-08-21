@@ -115,8 +115,9 @@
                                                 @endif
                                             </td>
                                             <td class="text-center">
-                                                <input type="number" wire:model="jam_ke.{{ $result['id'] }}"
-                                                    class="form-control" wire:key="jam_ke_{{ $result['id'] }}">
+                                                <input type="number" inputmode="numeric"
+                                                    wire:model="jam_ke.{{ $result['id'] }}" class="form-control"
+                                                    wire:key="jam_ke_{{ $result['id'] }}">
                                             </td>
                                         </tr>
                                     @endforeach

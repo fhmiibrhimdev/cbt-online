@@ -8,6 +8,7 @@ use App\Models\Kelas;
 use Livewire\Component;
 use App\Models\RunningText;
 use App\Models\PostComments;
+use App\Helpers\GlobalHelper;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -26,11 +27,15 @@ class Pengumuman extends Component
     public $comment;
     public $dataId, $mode;
     public $postIdWithComments = [];
+    public $id_tp, $id_smt;
 
     public function mount()
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $this->text    = RunningText::pluck('text', 'id')->toArray();
-        $this->kelases = Kelas::get();
+        $this->kelases  = DB::table('kelas')->select('kelas.id', 'kode_kelas', 'level')->leftJoin('level', 'level.id', 'kelas.id_level')->where('id_tp', $this->id_tp)->get()->groupBy('level');
 
         $this->dispatch('initSummernote');
         $this->dispatch('initSelect2');

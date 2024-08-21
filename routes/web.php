@@ -38,6 +38,11 @@ use App\Livewire\PelaksanaanUjian\Cetak\JadwalPengawas;
 use App\Livewire\Ujian\BankSoal\Detail as BankSoalDetail;
 use App\Livewire\Umum\KelasRombel\Edit as KelasRombelEdit;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Livewire\PelaksanaanUjian\HasilUjian\HasilUjian;
+use App\Livewire\PelaksanaanUjian\HasilUjian\Koreksi;
+use App\Livewire\PelaksanaanUjian\RekapNilai;
+use App\Livewire\PelaksanaanUjian\RekapNilai\Detail as RekapNilaiDetail;
+use App\Livewire\PelaksanaanUjian\StatusSiswa;
 use App\Livewire\Pengaturan\Administrator as PengaturanAdministrator;
 use App\Livewire\Siswa\Konfirmasi;
 use App\Livewire\Siswa\Mengerjakan;
@@ -52,12 +57,12 @@ Route::get('/', function () {
 
 Route::post('/', [AuthenticatedSessionController::class, 'store']);
 
-Route::post('summernote/file/upload', [UploadController::class, 'uploadImageSummernote']);
-Route::post('summernote/file/delete', [UploadController::class, 'deleteImageSummernote']);
-
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', Dashboard::class)->name('dashboard');
     Route::get('/profile', Profile::class);
+
+    Route::post('summernote/file/upload', [UploadController::class, 'uploadImageSummernote']);
+    Route::post('summernote/file/delete', [UploadController::class, 'deleteImageSummernote']);
 });
 
 Route::group(['middleware' => ['auth', 'role:administrator']], function () {
@@ -72,10 +77,9 @@ Route::group(['middleware' => ['auth', 'role:administrator']], function () {
 
     Route::get('/ujian/ruang', Ruang::class);
     Route::get('/ujian/atur-ruang', AturRuang::class);
-    Route::get('/ujian/atur-ruang/{id_kelas}', AturRuang::class)->name('atur-ruang');
     Route::get('/ujian/nomor-peserta', NomorPeserta::class);
     Route::get('/ujian/bank-soal', BankSoal::class);
-    Route::get('/ujian/bank-soal/{id_bank_soal}/{jenis}/detail', BankSoalDetail::class)->name('bank-soal-detail');
+    Route::get('/ujian/bank-soal/{id_bank_soal}/detail', BankSoalDetail::class)->name('bank-soal-detail');
     Route::get('/ujian/jenis-ujian', JenisUjian::class);
     Route::get('/ujian/sesi', Sesi::class);
     Route::get('/ujian/jadwal', Jadwal::class);
@@ -94,6 +98,12 @@ Route::group(['middleware' => ['auth', 'role:administrator']], function () {
     Route::get('/pelaksanaan-ujian/cetak/jadwal-pengawas/{id_jenis_ujian?}/{tgl_mulai?}/{tgl_akhir?}/{ttds?}', JadwalPengawas::class);
     Route::get('/pelaksanaan-ujian/cetak/peserta-ujian', PesertaUjian::class);
     Route::get('/pelaksanaan-ujian/cetak/peserta-ujian/{id_jenis_ujian?}/{by?}', PesertaUjian::class);
+    Route::get('/pelaksanaan-ujian/status-siswa', StatusSiswa::class);
+    Route::get('/pelaksanaan-ujian/rekap-nilai', RekapNilai::class);
+    Route::get('/pelaksanaan-ujian/rekap-nilai/{id_jadwal?}/detail', RekapNilaiDetail::class)->name('rekap-nilai-detail');
+
+    Route::get('/pelaksanaan-ujian/hasil-ujian', HasilUjian::class);
+    Route::get('/pelaksanaan-ujian/hasil-ujian/koreksi/{id_jadwal?}/{id_siswa?}', Koreksi::class);
 
     Route::get('/pengaturan/raport', Raport::class);
     Route::get('/pengaturan/profile-sekolah', ProfileSekolah::class);
@@ -105,8 +115,7 @@ Route::group(['middleware' => ['auth', 'role:administrator']], function () {
     Route::get('/control-user', User::class);
 });
 
-Route::group(['middleware' => ['auth', 'role:guru']], function () {
-});
+Route::group(['middleware' => ['auth', 'role:guru']], function () {});
 
 Route::group(['middleware' => ['auth', 'role:siswa']], function () {
     Route::get('/siswa/ujian', Ujian::class);

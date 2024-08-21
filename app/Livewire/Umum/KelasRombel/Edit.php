@@ -8,8 +8,9 @@ use App\Models\Siswa;
 use App\Models\Jurusan;
 use Livewire\Component;
 use App\Models\Semester;
-use App\Models\KelasDetail;
 use App\Models\SesiSiswa;
+use App\Models\KelasDetail;
+use App\Helpers\GlobalHelper;
 use App\Models\TahunPelajaran;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
@@ -21,22 +22,17 @@ class Edit extends Component
     public $dataId, $id_level, $id_jurusan, $nama_kelas, $kode_kelas, $id_guru, $jumlah_siswa;
     public $id_siswa = [];
     public $levels, $jurusans, $siswas, $siswasedit, $openForm, $prev_id_siswa;
+    public $id_tp, $id_smt;
 
     public function mount($id)
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $this->levels   = Level::get();
         $this->jurusans = Jurusan::get();
 
-        // $kelas_detail = KelasDetail::select('id_siswa')->get();
-        // $id_siswa_in_kelas = $kelas_detail->pluck('id_siswa')->toArray();
-
-        if (empty($id_siswa_in_kelas)) {
-            $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn', 'status_kelas', 'id_kelas')->get();
-        } else {
-            $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn', 'status_kelas')
-                ->whereNotIn('id', $id_siswa_in_kelas)
-                ->get();
-        }
+        $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn', 'status_kelas', 'id_kelas')->where('id_tp', $this->id_tp)->get();
 
         $data                = Kelas::findOrFail($id);
         $this->dataId        = $id;
@@ -69,12 +65,9 @@ class Edit extends Component
                 'nama_kelas' => 'required',
             ]);
 
-            $id_tp = TahunPelajaran::where('active', '0')->first()->id;
-            $id_smt = Semester::where('active', '0')->first()->id;
-
             Kelas::findOrFail($this->dataId)->update([
-                'id_tp'          => $id_tp,
-                'id_smt'         => $id_smt,
+                'id_tp'          => $this->id_tp,
+                'id_smt'         => $this->id_smt,
                 'nama_kelas'     => $this->nama_kelas,
                 'kode_kelas'     => $this->kode_kelas,
                 'id_jurusan'     => $this->id_jurusan,
@@ -91,8 +84,8 @@ class Edit extends Component
             foreach ($this->id_siswa as $siswa_id) {
                 $kelasDetailData[] = [
                     'id_kelas'       => $this->dataId,
-                    'id_tp'          => $id_tp,
-                    'id_smt'         => $id_smt,
+                    'id_tp'          => $this->id_tp,
+                    'id_smt'         => $this->id_smt,
                     'id_siswa'       => $siswa_id[0],
                 ];
             }

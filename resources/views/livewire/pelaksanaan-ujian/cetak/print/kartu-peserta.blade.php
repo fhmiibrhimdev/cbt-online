@@ -126,8 +126,8 @@
                                             alt="Signature" class="tw-h-8 tw-my-2"
                                             style="transform: scale({{ $ukuran_ttd }});">
                                     </center>
-                                    <p class="tw-text-xs tw-font-bold">Fahmi Ibrahim</p>
-                                    <p class="tw-text-xs">NIP: -</p>
+                                    <p class="tw-text-xs tw-font-bold">{{ $nama_kepsek }}</p>
+                                    <p class="tw-text-xs">NIP: {{ $nip_kepsek }}</p>
                                 </div>
                             </div>
                         </div>

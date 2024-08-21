@@ -31,9 +31,10 @@ class DatabaseSeeder extends Seeder
             ProfileSekolahSeeder::class,
             RunningTextSeeder::class,
             RaportAdminSettingSeeder::class,
+            FormatNomorPesertaSeeder::class,
 
-            AdministratorSeeder::class,
-            UserAndSiswaSeeder::class,
+            // AdministratorSeeder::class,
+            // UserAndSiswaSeeder::class,
         ]);
     }
 }

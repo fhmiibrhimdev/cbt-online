@@ -71,15 +71,15 @@
                     <table class="tw-border tw-border-black" border="1">
                         <thead>
                             <tr class="tw-border tw-border-black tw-text-center">
-                                <th width="8%"
+                                <th width="7%"
                                     class="tw-tracking-normal tw-text-black tw-py-2 tw-px-3 tw-text-base tw-bg-white tw-border tw-border-black">
                                     No
                                 </th>
-                                <th width="20%"
+                                <th width="30%"
                                     class="tw-tracking-normal tw-text-black tw-py-2 tw-px-3 tw-text-base tw-bg-white tw-border tw-border-black">
                                     No.
                                     Peserta</th>
-                                <th width="40%"
+                                <th width="45%"
                                     class="tw-tracking-normal tw-text-black tw-py-2 tw-px-3 tw-text-base tw-bg-white tw-border tw-border-black">
                                     Nama</th>
                                 <th width="12%"

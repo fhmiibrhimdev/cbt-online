@@ -146,7 +146,7 @@
                                                                     :</td>
                                                                 <td class="tw-border-none tw-p-0 tw-text-xs"
                                                                     width="50%">
-                                                                    0000.00.000
+                                                                    {{ $kode_jenjang }}-{{ $kode_tahun }}-{{ $kode_provinsi }}-{{ $kode_kota }}-{{ $kode_sekolah }}-XXXX-X
                                                                 </td>
                                                                 <td></td>
                                                             </tr>
@@ -232,8 +232,8 @@
                                                             alt="Signature" class="tw-h-8 tw-my-2"
                                                             style="transform: scale({{ $ukuran_ttd }});">
                                                     </center>
-                                                    <p class="tw-text-xs tw-font-bold">Fahmi Ibrahim</p>
-                                                    <p class="tw-text-xs">NIP: -</p>
+                                                    <p class="tw-text-xs tw-font-bold">{{ $nama_kepsek }}</p>
+                                                    <p class="tw-text-xs">NIP: {{ $nip_kepsek }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -251,11 +251,13 @@
                                         <div class="col-lg-9">
                                             <select wire:model="id_kelases" id="id_kelases" class="form-control">
                                                 <option value="0" disabled>-- Pilih Kelas --</option>
-                                                @foreach ($kelases as $kelas)
-                                                    <optgroup label="{{ $kelas->level }}">
-                                                        <option value="{{ $kelas->id }}">{{ $kelas->level }} -
-                                                            {{ $kelas->kode_kelas }}
-                                                        </option>
+                                                @foreach ($kelases as $level => $kelasGroup)
+                                                    <optgroup label="{{ $level }}">
+                                                        @foreach ($kelasGroup as $kelasItem)
+                                                            <option value="{{ $kelasItem->id }}">
+                                                                {{ $level }}-{{ $kelasItem->kode_kelas }}
+                                                            </option>
+                                                        @endforeach
                                                     </optgroup>
                                                 @endforeach
                                             </select>

@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\User;
 use App\Models\Siswa;
+use App\Models\Semester;
+use App\Models\TahunPelajaran;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -52,6 +54,8 @@ class SiswaFactory extends Factory
             ->create();
 
         return [
+            'id_tp'       => TahunPelajaran::where('active', '1')->first()->id ?? null,
+            'id_smt'      => Semester::where('active', '1')->first()->id ?? null,
             'id_user'     => $user->id, // Assign the created user's ID
             'nama_siswa'  => $fullName,
             'nis'         => $this->faker->unique()->numerify('#####'), // 5 digit angka

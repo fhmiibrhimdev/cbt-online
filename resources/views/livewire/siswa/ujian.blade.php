@@ -119,23 +119,39 @@
                                             </tbody>
                                         </table>
                                         @php
-                                            $currentTime = date('H:i:s');
-                                            $isWithinTimeRange =
-                                                $currentTime >= $siswa->waktu_mulai &&
-                                                $currentTime <= $siswa->waktu_akhir;
+                                            // Ambil tanggal dan waktu saat ini
+                                            $currentDateTime = now(); // atau date('Y-m-d H:i:s')
+
+                                            // Gabungkan tanggal dan waktu dari siswa
+                                            $startDateTime = \Carbon\Carbon::createFromFormat(
+                                                'Y-m-d H:i',
+                                                $jadwal->tgl_mulai . ' ' . $siswa->waktu_mulai,
+                                            );
+                                            $endDateTime = \Carbon\Carbon::createFromFormat(
+                                                'Y-m-d H:i',
+                                                $jadwal->tgl_selesai . ' ' . $siswa->waktu_akhir,
+                                            );
+
+                                            // Periksa apakah waktu saat ini berada dalam rentang yang ditentukan
+                                            $isWithinTimeRange = $currentDateTime->between(
+                                                $startDateTime,
+                                                $endDateTime,
+                                            );
                                         @endphp
 
                                         @if ($isWithinTimeRange && ($jadwal->status_ujian == '0' || $jadwal->status_ujian == ''))
                                             <a href="{{ url('/siswa/konfirmasi/' . Crypt::encryptString($jadwal->id)) }}"
-                                                class="btn btn-primary tw-rounded-none form-control tw-mt-4"><i
-                                                    class="fas fa-edit"></i>
-                                                MULAI</a>
+                                                class="btn btn-primary tw-rounded-none form-control tw-mt-4">
+                                                <i class="fas fa-edit"></i> MULAI
+                                            </a>
                                         @elseif ($jadwal->status_ujian == '1')
-                                            <a class="btn btn-success tw-rounded-none form-control tw-mt-4 disabled"><i
-                                                    class="fas fa-exclamation-triangle"></i> SELESAI</a>
+                                            <a class="btn btn-success tw-rounded-none form-control tw-mt-4 disabled">
+                                                <i class="fas fa-exclamation-triangle"></i> SELESAI
+                                            </a>
                                         @else
-                                            <a class="btn btn-danger tw-rounded-none form-control tw-mt-4 disabled"><i
-                                                    class="fas fa-exclamation-triangle"></i> SUDAH BERAKHIR</a>
+                                            <a class="btn btn-danger tw-rounded-none form-control tw-mt-4 disabled">
+                                                <i class="fas fa-exclamation-triangle"></i> SUDAH BERAKHIR
+                                            </a>
                                         @endif
                                     </div>
                                 </div>

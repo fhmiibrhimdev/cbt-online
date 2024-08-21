@@ -10,6 +10,7 @@ use Livewire\Component;
 use App\Models\Semester;
 use App\Models\KelasDetail;
 use Livewire\WithPagination;
+use App\Helpers\GlobalHelper;
 use App\Models\TahunPelajaran;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
@@ -34,9 +35,13 @@ class KelasRombel extends Component
     public $dataId, $id_level, $id_jurusan, $nama_kelas, $kode_kelas, $id_guru, $jumlah_siswa;
     public $id_siswa = [];
     public $levels, $jurusans, $siswas, $siswasedit, $openForm;
+    public $id_tp, $id_smt;
 
     public function mount()
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $this->levels     = Level::get();
         $this->jurusans   = Jurusan::get();
 
@@ -47,13 +52,12 @@ class KelasRombel extends Component
         $this->id_level   = '';
         $this->id_guru    = '';
 
-        $kelas_detail      = KelasDetail::select('id_siswa')->get();
-        $id_siswa_in_kelas = $kelas_detail->pluck('id_siswa')->toArray();
+        $id_siswa_in_kelas = KelasDetail::select('id_siswa')->get()->pluck('id_siswa')->toArray();
 
         if (empty($id_siswa_in_kelas)) {
-            $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn')->get();
+            $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn')->where('id_tp', $this->id_tp)->get();
         } else {
-            $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn')
+            $this->siswas = Siswa::select('id', 'nama_siswa', 'nisn')->where('id_tp', $this->id_tp)
                 ->whereNotIn('id', $id_siswa_in_kelas)
                 ->get();
         }
@@ -81,7 +85,10 @@ class KelasRombel extends Component
         $data = Kelas::select('kelas.id', 'kelas.nama_kelas', 'kelas.kode_kelas', 'kelas.jumlah_siswa', 'jurusan.nama_jurusan', 'level')
             ->join('jurusan', 'jurusan.id', 'kelas.id_jurusan')
             ->join('level', 'level.id', 'kelas.id_level')
-            ->where('nama_kelas', 'LIKE', $search)
+            ->where(function ($query) use ($search) {
+                $query->where('nama_kelas', 'LIKE', $search);
+            })
+            ->where('kelas.id_tp', $this->id_tp)
             ->paginate($this->lengthData);
 
         return view('livewire.umum.kelas-rombel.kelas-rombel', compact('data'));
@@ -126,12 +133,9 @@ class KelasRombel extends Component
         DB::transaction(function () {
             $this->validate();
 
-            $id_tp = TahunPelajaran::where('active', '0')->first()->id;
-            $id_smt = Semester::where('active', '0')->first()->id;
-
             $kelas = Kelas::create([
-                'id_tp'          => $id_tp,
-                'id_smt'         => $id_smt,
+                'id_tp'          => $this->id_tp,
+                'id_smt'         => $this->id_smt,
                 'nama_kelas'     => $this->nama_kelas,
                 'kode_kelas'     => $this->kode_kelas,
                 'id_jurusan'     => $this->id_jurusan,
@@ -145,8 +149,8 @@ class KelasRombel extends Component
             foreach ($this->id_siswa as $siswa_id) {
                 $kelasDetailData[] = [
                     'id_kelas'       => $kelas->id,
-                    'id_tp'          => $id_tp,
-                    'id_smt'         => $id_smt,
+                    'id_tp'          => $this->id_tp,
+                    'id_smt'         => $this->id_smt,
                     'id_siswa'       => $siswa_id[0],
                 ];
             }

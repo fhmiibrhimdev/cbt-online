@@ -2,11 +2,12 @@
 
 namespace App\Livewire\PelaksanaanUjian\Cetak;
 
+use App\Models\Sesi;
 use Livewire\Component;
 use App\Models\SesiSiswa;
 use App\Models\JenisUjian;
 use App\Models\KopAbsensi;
-use App\Models\Sesi;
+use App\Helpers\GlobalHelper;
 use App\Models\TahunPelajaran;
 use Livewire\Attributes\Title;
 
@@ -17,9 +18,13 @@ class PesertaUjian extends Component
     public $ujians, $sesis, $data;
     public $jenis_ujian, $byes = 'ruang';
     public $id_jenises = '1', $id_jenis, $by;
+    public $id_tp, $id_smt;
 
     public function mount($id_jenis_ujian = "", $by = "")
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $data = KopAbsensi::findOrFail('1');
         $this->header_1 = $data->header_1;
         $this->header_2 = $data->header_2;
@@ -68,6 +73,7 @@ class PesertaUjian extends Component
             ->join('siswa', 'siswa.id', '=', 'sesi_siswa.id_siswa')
             ->join('kelas', 'kelas.id', '=', 'sesi_siswa.id_kelas')
             ->join('nomor_peserta', 'nomor_peserta.id_siswa', '=', 'siswa.id')
+            ->where('sesi_siswa.id_tp', $this->id_tp)
             ->orderBy('nama_ruang', 'ASC')
             ->orderBy('nama_sesi', 'ASC')
             ->orderBy('nomor_peserta', 'ASC')

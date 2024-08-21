@@ -8,6 +8,7 @@ use App\Models\Jadwal;
 use Livewire\Component;
 use App\Models\JenisUjian;
 use Livewire\WithPagination;
+use App\Helpers\GlobalHelper;
 use Livewire\Attributes\Title;
 
 class AlokasiWaktu extends Component
@@ -22,11 +23,14 @@ class AlokasiWaktu extends Component
     public $searchTerm;
     public $previousSearchTerm = '';
     public $isEditing = false;
-
+    public $id_tp, $id_smt;
     public $dataId;
 
     public function mount()
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $this->ujians     = JenisUjian::get();
         $this->levels     = Level::get();
         $this->start_date = Carbon::now()->startOfMonth()->format('Y-m-d');
@@ -67,7 +71,10 @@ class AlokasiWaktu extends Component
         $data = Jadwal::select('jadwal.id', 'bank_soal.kode_bank', 'bank_soal.id_level', 'mata_pelajaran.nama_mapel', 'bank_soal.id_kelas', 'jadwal.tgl_mulai', 'jadwal.jam_ke')
             ->join('bank_soal', 'bank_soal.id', 'jadwal.id_bank')
             ->join('mata_pelajaran', 'mata_pelajaran.id', 'bank_soal.id_mapel')
-            ->where('id_jenis_ujian', $this->id_jenis_ujian)
+            ->where([
+                ['id_jenis_ujian', $this->id_jenis_ujian],
+                ['jadwal.id_tp', $this->id_tp],
+            ])
             ->whereBetween('tgl_mulai', [$this->start_date, $this->end_date])
             ->when($this->id_level, function ($query, $id_level) {
                 return $query->where('bank_soal.id_level', $id_level);
@@ -92,7 +99,7 @@ class AlokasiWaktu extends Component
     {
         foreach ($this->jam_ke as $id => $jamKe) {
             if (array_key_exists($id, $this->jam_ke)) {
-                Jadwal::where('id', $id)->update(['jam_ke' => $jamKe]);
+                Jadwal::where('id', $id)->update(['jam_ke' => $jamKe, 'id_tp' => $this->id_tp, 'id_smt' => $this->id_smt]);
             }
         }
 

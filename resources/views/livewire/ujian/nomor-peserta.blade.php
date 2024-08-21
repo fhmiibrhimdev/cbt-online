@@ -14,12 +14,17 @@
                                 <label for="id_kelas">Kelas </label>
                                 <select wire:model.live="id_kelas" id="id_kelas" class="form-control" multiple>
                                     <option value="" disabled>-- Pilih Kelas --</option>
-                                    <option value="all" @if (is_array($id_kelas) && !empty($id_kelas) && array_diff($id_kelas, ['all'])) disabled @endif>Semua Kelas
-                                    </option>
-                                    @foreach ($kelass as $kelas)
-                                        <optgroup label="{{ $kelas->level }}">
-                                            <option value="{{ $kelas->id }}">{{ $kelas->level }} -
-                                                {{ $kelas->kode_kelas }}</option>
+                                    @foreach ($kelass as $level => $kelasGroup)
+                                        <optgroup label="{{ $level }}">
+                                            <option value="all_{{ $kelasGroup->first()->id_level }}">
+                                                Semua Kelas ( {{ $level }} )
+                                            </option>
+                                            @foreach ($kelasGroup as $kelasItem)
+                                                <option value="{{ $kelasItem->id }}"
+                                                    @if (in_array($kelasItem->id, $kelasDisabled)) disabled @endif>
+                                                    {{ $level }}-{{ $kelasItem->kode_kelas }}
+                                                </option>
+                                            @endforeach
                                         </optgroup>
                                     @endforeach
                                 </select>
@@ -91,8 +96,56 @@
                     </div>
                 </div>
             </div>
+            <button wire:click.prevent="" class="btn-modal" data-toggle="modal" data-backdrop="static"
+                data-keyboard="false" data-target="#formDataModal">
+                <i class="far fa-edit"></i>
+            </button>
         </div>
     </section>
+    <div class="modal fade" wire:ignore.self id="formDataModal" aria-labelledby="formDataModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form>
+                    <div class="modal-body">
+                        <p class="mb-3 mt-2 tw-font-semibold tw-text-base tw-text-[#34395e]">Bentuk Format:
+                            {{ $kode_jenjang }}-{{ $kode_tahun }}-{{ $kode_provinsi }}-{{ $kode_kota }}-{{ $kode_sekolah }}-XXXX-X
+                        </p>
+                        <div class="form-group">
+                            <label for="kode_jenjang">Kode Jenjang<small class="text-danger"> *(A) </small></label>
+                            <select wire:model="kode_jenjang" id="kode_jenjang" class="form-control">
+                                @foreach (['0' => '-- Pilih Kode Jenjang --', '1' => 'SD/MI', '2' => 'SMP/MTS', '3' => 'SMA/MA', '4' => 'SMK', 'A' => 'PAKET A', 'B' => 'PAKET B', 'C' => 'PAKET C'] as $value => $label)
+                                    <option value="{{ $value }}"
+                                        @if ($kode_jenjang == $value) selected @endif>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="kode_tahun">Kode Tahun <small class="text-danger">*(BB)</small></label>
+                            <input type="text" wire:model="kode_tahun" id="kode_tahun" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="kode_provinsi">Kode Provinsi <small class="text-danger">*(CC)</small></label>
+                            <input type="text" wire:model="kode_provinsi" id="kode_provinsi" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="kode_kota">Kode Kota/Kab <small class="text-danger">*(XX)</small></label>
+                            <input type="text" wire:model="kode_kota" id="kode_kota" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="kode_sekolah">Kode Sekolah <small class="text-danger">*(YYY)</small></label>
+                            <input type="text" wire:model="kode_sekolah" id="kode_sekolah" class="form-control">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary tw-bg-gray-300"
+                            data-dismiss="modal">Close</button>
+                        <button type="submit" wire:click.prevent="update()" wire:loading.attr="disabled"
+                            class="btn btn-primary tw-bg-blue-500">Save Data</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('general-css')

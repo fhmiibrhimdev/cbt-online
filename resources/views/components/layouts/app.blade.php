@@ -70,11 +70,17 @@
                 <div class="container">
                     <ul class="navbar-nav">
                         @if (request()->is('siswa/ujian') ||
-                                str_contains(request()->path(), 'siswa/konfirmasi' || str_contains(request()->path(), 'siswa/mengerjakan')))
+                                str_contains(request()->path(), '/siswa/konfirmasi' || str_contains(request()->path(), '/siswa/mengerjakan')))
                             @if (Auth::user()->hasRole('siswa'))
                                 <p class="tw-text-xl tw-text-[#34395e] tw-tracking-wider tw-font-semibold">CBT Tahun
                                     Pelajaran: {{ \App\Models\TahunPelajaran::where('active', '1')->first()->tahun }}
                                     Smt: {{ \App\Models\Semester::where('active', '1')->first()->semester }}</p>
+                            @else
+                                <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
+                                    <a href="/dashboard" class="nav-link">
+                                        <i class="far fa-home"></i><span>Dashboard</span>
+                                    </a>
+                                </li>
                             @endif
                         @else
                             <li class="nav-item {{ request()->is('dashboard') ? 'active' : '' }}">
@@ -165,7 +171,7 @@
                             </li>
                             <li
                                 class="nav-item dropdown 
-                            {{ request()->is('pelaksanaan-ujian/cetak') || str_contains(request()->path(), 'pelaksanaan-ujian/cetak') || request()->is('pelaksanaan-ujian/status-siswa') || request()->is('pelaksanaan-ujian/hasil-ujian') || request()->is('pelaksanaan-ujian/analisis-soal') || request()->is('pelaksanaan-ujian/rekap') ? 'active' : '' }}">
+                            {{ request()->is('pelaksanaan-ujian/cetak') || str_contains(request()->path(), 'pelaksanaan-ujian/cetak') || request()->is('pelaksanaan-ujian/status-siswa') || request()->is('pelaksanaan-ujian/hasil-ujian') || str_contains(request()->path(), 'pelaksanaan-ujian/hasil-ujian') || request()->is('pelaksanaan-ujian/analisis-soal') || request()->is('pelaksanaan-ujian/rekap-nilai') || str_contains(request()->path(), 'pelaksanaan-ujian/rekap-nilai') ? 'active' : '' }}">
                                 <a href="#" data-toggle="dropdown" class="nav-link has-dropdown">
                                     <i class="far fa-graduation-cap"></i><span>Pelaksanaan Ujian</span>
                                 </a>
@@ -174,22 +180,26 @@
                                         class="nav-item {{ request()->is('pelaksanaan-ujian/cetak') || str_contains(request()->path(), 'pelaksanaan-ujian/cetak') ? 'active' : '' }}">
                                         <a href="{{ url('pelaksanaan-ujian/cetak') }}" class="nav-link">Cetak</a>
                                     </li>
-                                    <li class="nav-item">
+                                    <li
+                                        class="nav-item {{ request()->is('pelaksanaan-ujian/status-siswa') ? 'active' : '' }}">
                                         <a href="{{ url('pelaksanaan-ujian/status-siswa') }}" class="nav-link">Status
                                             Siswa</a>
                                     </li>
-                                    <li class="nav-item">
+                                    <li
+                                        class="nav-item {{ request()->is('pelaksanaan-ujian/hasil-ujian') || str_contains(request()->path(), 'pelaksanaan-ujian/hasil-ujian') ? 'active' : '' }}">
                                         <a href="{{ url('pelaksanaan-ujian/hasil-ujian') }}" class="nav-link">Hasil
                                             Ujian</a>
                                     </li>
-                                    <li class="nav-item">
+                                    {{-- <li class="nav-item">
                                         <a href="{{ url('pelaksanaan-ujian/analisis-soal') }}"
                                             class="nav-link">Analisis
                                             Soal</a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a href="{{ url('pelaksanaan-ujian/rekap') }}" class="nav-link">Rekap</a>
-                                    </li>
+                                    <li
+                                        class="nav-item {{ request()->is('pelaksanaan-ujian/rekap-nilai') || str_contains(request()->path(), 'pelaksanaan-ujian/rekap-nilai') ? 'active' : '' }}">
+                                        <a href="{{ url('pelaksanaan-ujian/rekap-nilai') }}" class="nav-link">Rekap
+                                            Nilai</a>
+                                    </li> --}}
                                 </ul>
                             </li>
                             <li
@@ -267,6 +277,7 @@
                 icon: event.detail[0].type,
             })
             $("#formDataModal").modal("hide");
+            $("#inputDataModal").modal("hide");
             $("#formDataKelompokModal").modal("hide");
             $("#formDataSubKelompokModal").modal("hide");
         })

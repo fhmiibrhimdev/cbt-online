@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('siswa', function (Blueprint $table) {
             $table->id();
+            $table->text('id_tp');
+            $table->text('id_smt');
             $table->text('id_user');
             $table->text('nama_siswa')->default("");
             $table->text('nis')->default("");

@@ -92,16 +92,18 @@
                                                     data-target="#formDataModal">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button wire:click.prevent="deleteConfirm({{ $result['id'] }})"
-                                                    class="btn btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
+                                                @if (!$result['nilai_count'] > 0)
+                                                    <button wire:click.prevent="deleteConfirm({{ $result['id'] }})"
+                                                        class="btn btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">Not data available in the table</td>
+                                        <td colspan="7" class="text-center">Not data available in the table</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -133,44 +135,48 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label for="id_mapel">Mata Pelajaran</label>
-                                    <div wire:ignore>
-                                        <select wire:model="id_mapel" id="id_mapel" class="form-control">
-                                            <option value="">-- Pilih Mata Pelajaran --</option>
-                                            @foreach ($mapels as $mapel)
-                                                <option value="{{ $mapel->id }}"
-                                                    @if ((int) $mapel->id == (int) $id_mapel) selected @endif>
-                                                    {{ $mapel->nama_mapel }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    {{-- <div wire:ignore> --}}
+                                    <select wire:model="id_mapel" id="id_mapel" class="form-control">
+                                        <option value="" disabled>-- Pilih Mata Pelajaran --</option>
+                                        @foreach ($mapels as $mapel)
+                                            <option value="{{ $mapel->id }}"
+                                                @if ((int) $mapel->id == (int) $id_mapel) selected @endif>
+                                                {{ $mapel->nama_mapel }}</option>
+                                        @endforeach
+                                    </select>
+                                    {{-- </div> --}}
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label for="id_bank">Bank Soal</label>
                                     <select wire:model="id_bank" id="id_bank" class="form-control">
-                                        <option value="">-- Pilih Bank Soal --</option>
+                                        <option value="" disabled>-- Pilih Bank Soal --</option>
                                         @foreach ($banks as $bank)
                                             <option value="{{ $bank->id }}"
                                                 @if ((int) $bank->id == (int) $id_bank) selected @endif>
                                                 {{ $bank->kode_bank }}</option>
                                         @endforeach
                                     </select>
+                                    @error('id_bank')
+                                        <small class='text-danger'>{{ $message }}</small>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="id_jenis_ujian">Jenis Ujian</label>
-                            <div wire:ignore>
-                                <select wire:model="id_jenis_ujian" id="id_jenis_ujian" class="form-control">
-                                    <option value="">-- Pilih Jenis Ujian --</option>
-                                    @foreach ($ujians as $ujian)
-                                        <option value="{{ $ujian->id }}"
-                                            @if ((int) $ujian->id == (int) $id_jenis_ujian) selected @endif>{{ $ujian->nama_jenis }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            <select wire:model="id_jenis_ujian" id="id_jenis_ujian" class="form-control">
+                                <option value="" disabled>-- Pilih Jenis Ujian --</option>
+                                @foreach ($ujians as $ujian)
+                                    <option value="{{ $ujian->id }}"
+                                        @if ((int) $ujian->id == (int) $id_jenis_ujian) selected @endif>{{ $ujian->nama_jenis }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('id_jenis_ujian')
+                                <small class='text-danger'>{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="row">
                             <div class="col-lg-6">
@@ -209,7 +215,7 @@
                                     <label for="acak_soal">Acak Soal</label>
                                     <div class="ml-auto">
                                         <label class="switch" wire:key="{{ rand() }}">
-                                            <input type="checkbox" wire:model="acak_soal" id="acak_soal"
+                                            <input type="checkbox" id="acak_soal" wire:model="acak_soal"
                                                 @if ($acak_soal == '1') checked @endif>
                                             <span class="slider round"></span>
                                         </label>
@@ -221,8 +227,9 @@
                                     <label for="acak_opsi">Acak Jawaban</label>
                                     <div class="ml-auto">
                                         <label class="switch" wire:key="{{ rand() }}">
-                                            <input type="checkbox" wire:model="acak_opsi" id="acak_opsi"
-                                                @if ($acak_opsi == '1') checked @endif>
+                                            <input type="checkbox" id="acak_opsi"
+                                                @if ($acak_opsi == '1') checked @endif
+                                                @if ($nilai_count > 0) disabled @else wire:model="acak_opsi" @endif>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>
@@ -273,8 +280,9 @@
                                     <label for="status">Aktif</label>
                                     <div class="ml-auto">
                                         <label class="switch" wire:key="{{ rand() }}">
-                                            <input type="checkbox" wire:model="status" id="status"
-                                                @if ($status == '1') checked @endif>
+                                            <input type="checkbox" id="status"
+                                                @if ($status == '1') checked @endif
+                                                @if ($nilai_count > 0) disabled @else wire:model="status" @endif>
                                             <span class="slider round"></span>
                                         </label>
                                     </div>

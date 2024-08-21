@@ -3,6 +3,7 @@
 namespace App\Livewire\Siswa;
 
 use App\Models\BankSoal;
+use App\Models\DurasiSiswa;
 use App\Models\Soal;
 use App\Models\Siswa;
 use App\Models\Token;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\Crypt;
 class Konfirmasi extends Component
 {
     #[Title('Ujian')]
-    public $ids = '', $id_user = '';
+    public $ids = '', $id_user = '', $id_siswa;
     public $token;
     public $jadwal;
     public $siswa;
@@ -28,6 +29,7 @@ class Konfirmasi extends Component
         try {
             $this->ids = Crypt::decryptString($id_jadwal);
             $this->id_user = Auth::user()->id;
+            $this->id_siswa = Siswa::where('id_user', Auth::user()->id)->first()->id;
         } catch (\Throwable $th) {
             return redirect('/siswa/ujian');
         }
@@ -35,7 +37,7 @@ class Konfirmasi extends Component
         $checkStatusUjian = NilaiSoalSiswa::select('status')
             ->where([
                 ['id_jadwal', $this->ids],
-                ['id_siswa', $this->id_user]
+                ['id_siswa', $this->id_siswa]
             ])->first()->status ?? 0;
 
         if ($checkStatusUjian == "1") {
@@ -83,7 +85,7 @@ class Konfirmasi extends Component
             ])
             ->first();
 
-        // dd($this->jadwal->id_bank);
+        // dd($this->jadwal);
         // dd($this->ids);
     }
 
@@ -119,8 +121,10 @@ class Konfirmasi extends Component
         $check_ada = NilaiSoalSiswa::where([
             ['id_bank', $this->jadwal->id_bank],
             ['id_jadwal', $this->ids],
-            ['id_siswa', Auth::user()->id],
-        ])->whereDate('created_at', date('Y-m-d'))->exists();
+            ['id_siswa', $this->id_siswa],
+        ])->whereDate('tanggal', date('Y-m-d'))->exists();
+
+        // dd($check_ada);
 
         if (!$check_ada) {
             $soals = Soal::select('soal.id', 'id_bank', 'jenis', 'nomor_soal', 'soal', 'opsi_a', 'opsi_b', 'opsi_c', 'opsi_d', 'opsi_e', 'jawaban', 'jml_pg', 'bobot_pg', 'jml_esai', 'bobot_esai')
@@ -129,72 +133,89 @@ class Konfirmasi extends Component
                     ['id_bank', $this->jadwal->id_bank],
                     ['tampilkan', '1']
                 ])
+                ->orderBy('jenis', 'ASC')
                 ->get();
 
-            $nilai_soal = NilaiSoalSiswa::create([
-                'tanggal'        => date('Y-m-d'),
-                'id_bank'        => $this->jadwal->id_bank,
-                'id_jadwal'      => $this->ids,
-                'id_siswa'       => Auth::user()->id,
-            ]);
+            DB::transaction(function () use ($soals) {
+                DurasiSiswa::where([['id_siswa', $this->id_siswa], ['id_jadwal', $this->ids],])->update(['status' => '1', 'mulai' => now()]);
 
-            $data = [];
+                $nilai_soal = DB::table('nilai_soal_siswa')->insertGetId([
+                    'tanggal'        => date('Y-m-d'),
+                    'id_bank'        => $this->jadwal->id_bank,
+                    'id_jadwal'      => $this->ids,
+                    'id_siswa'       => $this->id_siswa,
+                ]);
 
-            foreach ($soals as $index => $soal) {
-                $options = [
-                    'A' => $soal->opsi_a,
-                    'B' => $soal->opsi_b,
-                    'C' => $soal->opsi_c,
-                    'D' => $soal->opsi_d,
-                    'E' => $soal->opsi_e,
-                ];
+                $data = [];
 
-                // Mengacak urutan opsi jika acak_opsi bernilai 1
-                if ($this->jadwal->acak_opsi == 1) {
-                    $keys = array_keys($options); // Contoh: ['A', 'B', 'C', 'D', 'E']
-                    shuffle($keys); // Mengacak urutan, contoh: ['B', 'D', 'A', 'C', 'E']
-                } else {
-                    $keys = array_keys($options); // Tidak mengacak urutan
+                foreach ($soals as $index => $soal) {
+                    $options = [
+                        'A' => $soal->opsi_a,
+                        'B' => $soal->opsi_b,
+                        'C' => $soal->opsi_c,
+                        'D' => $soal->opsi_d,
+                        'E' => $soal->opsi_e,
+                    ];
+
+                    // Mengacak urutan opsi jika acak_opsi bernilai 1
+                    if ($this->jadwal->acak_opsi == 1) {
+                        $keys = array_keys($options); // Contoh: ['A', 'B', 'C', 'D', 'E']
+                        shuffle($keys); // Mengacak urutan, contoh: ['B', 'D', 'A', 'C', 'E']
+                    } else {
+                        $keys = array_keys($options); // Tidak mengacak urutan
+                    }
+
+                    $aliases = "";
+
+                    if ($soal->jawaban == $keys[0]) {
+                        $aliases = "A";
+                    } elseif ($soal->jawaban == $keys[1]) {
+                        $aliases = "B";
+                    } elseif ($soal->jawaban == $keys[2]) {
+                        $aliases = "C";
+                    } elseif ($soal->jawaban == $keys[3]) {
+                        $aliases = "D";
+                    } elseif ($soal->jawaban == $keys[4]) {
+                        $aliases = "E";
+                    }
+
+                    $jwb_siswa = '';
+                    if ($soal->jenis == "3") {
+                        $jwb_jodoh = json_decode($soal->jawaban, true);
+                        if (isset($jwb_jodoh['links']) && is_array($jwb_jodoh['links'])) {
+                            foreach ($jwb_jodoh['links'] as &$link) {
+                                if (is_array($link)) {
+                                    $link = [];
+                                }
+                            }
+                        }
+                        $jwb_siswa = json_encode($jwb_jodoh, JSON_UNESCAPED_SLASHES);
+                    }
+
+                    $data[] = [
+                        'id_nilai_soal'  => $nilai_soal,
+                        'id_soal'        => $soal->id,
+                        'jenis_soal'     => $soal->jenis,
+                        'no_soal_alias'  => $index + 1,
+                        'opsi_alias_a'   => $soal->jenis == "1" ? $keys[0] : ($soal->jenis == "2" ? $soal->opsi_a : ''),
+                        'opsi_alias_b'   => $soal->jenis == "1" ? $keys[1] : '',
+                        'opsi_alias_c'   => $soal->jenis == "1" ? $keys[2] : '',
+                        'opsi_alias_d'   => $soal->jenis == "1" ? $keys[3] : '',
+                        'opsi_alias_e'   => $soal->jenis == "1" ? $keys[4] : '',
+                        'jawaban_alias'  => $soal->jenis == "1" ? $aliases : ($soal->jenis == "2" || $soal->jenis == "3" || $soal->jenis == "4" || $soal->jenis == "5" ? $soal->jawaban : ''),
+                        'jawaban_siswa'  => $soal->jenis == "2" ?  '[]' : ($soal->jenis == "3" ? $jwb_siswa : ''),
+                        'jawaban_benar'  => $soal->jawaban,
+                        'point_essai'    => (float)$soal->jml_esai > 0 ? (float)$soal->bobot_esai / (float)$soal->jml_esai : 0,
+                        'soal_end'       => '0',
+                        'point_soal'     => (float)$soal->jml_pg > 0 ? (float)$soal->bobot_pg / (float)$soal->jml_pg : 0,
+                        'nilai_koreksi'  => '0',
+                        'nilai_otomatis' => '0',
+                        'created_at'     => now(),
+                        'updated_at'     => now(),
+                    ];
                 }
 
-                $aliases = "";
-
-                if ($soal->jawaban == $keys[0]) {
-                    $aliases = "A";
-                } elseif ($soal->jawaban == $keys[1]) {
-                    $aliases = "B";
-                } elseif ($soal->jawaban == $keys[2]) {
-                    $aliases = "C";
-                } elseif ($soal->jawaban == $keys[3]) {
-                    $aliases = "D";
-                } elseif ($soal->jawaban == $keys[4]) {
-                    $aliases = "E";
-                }
-
-                $data[] = [
-                    'id_nilai_soal'  => $nilai_soal->id,
-                    'id_soal'        => $soal->id,
-                    'jenis_soal'     => $soal->jenis,
-                    'no_soal_alias'  => $index + 1,
-                    'opsi_alias_a'   => $keys[0],
-                    'opsi_alias_b'   => $keys[1],
-                    'opsi_alias_c'   => $keys[2],
-                    'opsi_alias_d'   => $keys[3],
-                    'opsi_alias_e'   => $keys[4],
-                    'jawaban_alias'  => $aliases,
-                    'jawaban_siswa'  => '',
-                    'jawaban_benar'  => $soal->jawaban,
-                    'point_essai'    => (float)$soal->jml_esai > 0 ? (float)$soal->bobot_esai / (float)$soal->jml_esai : 0,
-                    'soal_end'       => '0',
-                    'point_soal'     => (float)$soal->jml_pg > 0 ? (float)$soal->bobot_pg / (float)$soal->jml_pg : 0,
-                    'nilai_koreksi'  => '0',
-                    'nilai_otomatis' => '0',
-                    'created_at'     => now(),
-                    'updated_at'     => now(),
-                ];
-            }
-
-            DB::transaction(function () use ($data) {
+                // Simpan data ke tabel soal_siswa
                 DB::table('soal_siswa')->insert($data);
             });
 

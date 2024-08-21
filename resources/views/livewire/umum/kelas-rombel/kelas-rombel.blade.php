@@ -230,6 +230,12 @@
                 @this.set('jumlah_siswa', len)
                 return len
             }
+
+            window.addEventListener('reloadPage', event => {
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1500);
+            })
         });
     </script>
 @endpush

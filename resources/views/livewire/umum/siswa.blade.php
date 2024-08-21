@@ -6,7 +6,17 @@
 
         <div class="section-body">
             <div class="card">
-                <h3>Table Siswa</h3>
+                <div class="tw-flex tw-ml-6 tw-mt-6 lg:tw-mb-1">
+                    <h3 class="tw-tracking-wider  tw-text-base tw-text-[#34395e] tw-font-semibold">
+                        Table Siswa</h3>
+                    <div class="show-entries ml-auto mr-3 tw-mt-[-5px]">
+                        <p class="show-entries-show">Filter</p>
+                        <select wire:model.live="filter">
+                            <option value="1">Aktif</option>
+                            <option value="2">Tanpa Kelas</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="card-body">
                     <div class="show-entries">
                         <p class="show-entries-show">Show</p>
@@ -40,7 +50,9 @@
                                     <tr>
                                         <td class="text-center">{{ $loop->index + 1 }}</td>
                                         <td class="text-center">{{ $row->nis }} / {{ $row->nisn }}</td>
-                                        <td><span class="badge badge-primary">{{ $row->nama_kelas }}</span> -
+                                        <td><span
+                                                class="badge badge-primary">{{ $row->level }}-{{ $row->nama_kelas }}</span>
+                                            -
                                             {{ Str::limit($row->nama_siswa, 27) }}</td>
                                         <td class="text-center">L</td>
                                         <td class="text-center">
@@ -102,8 +114,8 @@
                                         role="tab" aria-controls="siswa" aria-selected="true">Siswa</a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link" id="detail-tab" data-toggle="tab" href="#detail" role="tab"
-                                        aria-controls="detail" aria-selected="false">Detail</a>
+                                    <a class="nav-link" id="detail-tab" data-toggle="tab" href="#detail"
+                                        role="tab" aria-controls="detail" aria-selected="false">Detail</a>
                                 </li>
                                 <li class="nav-item">
                                     <a class="nav-link" id="keluarga-tab" data-toggle="tab" href="#keluarga"

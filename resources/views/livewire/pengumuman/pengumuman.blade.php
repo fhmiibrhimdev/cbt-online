@@ -61,8 +61,14 @@
                                         <option value="siswa">Semua Siswa</option>
                                     @endif
                                     @if ($showKelasOptions)
-                                        @foreach ($kelases as $kelas)
-                                            <option value="{{ $kelas->id }}">{{ $kelas->kode_kelas }}</option>
+                                        @foreach ($kelases as $level => $kelasGroup)
+                                            <optgroup label="{{ $level }}">
+                                                @foreach ($kelasGroup as $kelasItem)
+                                                    <option value="{{ $kelasItem->id }}">
+                                                        {{ $level }}-{{ $kelasItem->kode_kelas }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
                                         @endforeach
                                     @endif
                                 </select>

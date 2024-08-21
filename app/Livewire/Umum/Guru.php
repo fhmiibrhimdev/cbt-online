@@ -2,21 +2,22 @@
 
 namespace App\Livewire\Umum;
 
-use App\Models\BankSoal;
 use App\Models\User;
 use App\Models\Kelas;
 use Livewire\Component;
+use App\Models\BankSoal;
+use App\Models\Pengawas;
+use App\Models\RoleUser;
 use App\Models\Semester;
 use App\Models\LevelGuru;
 use App\Models\JabatanGuru;
 use Livewire\WithPagination;
+use App\Helpers\GlobalHelper;
 use App\Models\MataPelajaran;
 use App\Models\TahunPelajaran;
 use Livewire\Attributes\Title;
 use App\Models\JabatanGuruDetail;
 use App\Models\Guru as ModelsGuru;
-use App\Models\Pengawas;
-use App\Models\RoleUser;
 use Illuminate\Support\Facades\Hash;
 
 class Guru extends Component
@@ -39,11 +40,15 @@ class Guru extends Component
     public $isEditing = false;
 
     public $dataId, $id_user, $nip, $nama_guru, $email, $kode_guru, $no_ktp, $tempat_lahir, $tgl_lahir, $jk, $no_hp, $alamat, $rt, $rw, $kelurahan_desa, $kecamatan, $kabupaten_kota, $kode_pos, $kewarganegaraan, $nuptk, $jenis_ptk, $tgs_tambahan, $status_pegawai, $status_aktif, $status_nikah, $tmt, $keahlian_isyarat, $npwp, $foto, $level_guru, $agama;
-
+    public $id_tp, $id_smt;
     public $id_jabatan, $id_kelas, $id_jabatan_guru, $id_mapel, $id_mapel_kelas;
+
 
     public function mount()
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $this->id_jabatan       = '';
         $this->id_kelas         = '';
         $this->id_mapel         = [];
@@ -127,13 +132,21 @@ class Guru extends Component
             ->where(function ($query) use ($search) {
                 $query->where('guru.nama_guru', 'LIKE', $search);
             })
+            ->where([
+                ['guru.id_tp', $this->id_tp],
+            ])
             ->orderBy('guru.id', 'DESC')
             ->paginate($this->lengthData);
 
         $mapels = MataPelajaran::select('id', 'nama_mapel')->where('status', '1')->get();
-        $kelas  = Kelas::select('kelas.id', 'kode_kelas', 'level')->leftJoin('level', 'level.id', 'kelas.id_level')->get();
+        $kelas  = Kelas::select('kelas.id', 'kode_kelas', 'level')->leftJoin('level', 'level.id', 'kelas.id_level')->where('id_tp', $this->id_tp)->get()->groupBy('level');
 
         return view('livewire.umum.guru', compact('data', 'mapels', 'kelas'));
+    }
+
+    public function updatedData()
+    {
+        $this->dispatch('initSelect2');
     }
 
     private function dispatchAlert($type, $message, $text)
@@ -176,6 +189,8 @@ class Guru extends Component
         $user->addRole('guru');
 
         $guru = ModelsGuru::create([
+            'id_tp'     => $this->id_tp,
+            'id_smt'    => $this->id_smt,
             'id_user'   => $user->id,
             'nip'       => $this->nip,
             'nama_guru' => $this->nama_guru,
@@ -183,15 +198,12 @@ class Guru extends Component
             'kode_guru' => $this->kode_guru,
         ]);
 
-        $id_tp  = TahunPelajaran::where('active', '1')->first()->id;
-        $id_smt = Semester::where('active', '1')->first()->id;
-
         JabatanGuru::create([
             'id_guru'    => $guru->id,
             'id_jabatan' => '0',
             'id_kelas'   => '0',
-            'id_tp'      => $id_tp,
-            'id_smt'     => $id_smt,
+            'id_tp'      => $this->id_tp,
+            'id_smt'     => $this->id_smt,
         ]);
 
         $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
@@ -274,6 +286,8 @@ class Guru extends Component
             ]);
 
             ModelsGuru::findOrFail($this->dataId)->update([
+                'id_tp'            => $this->id_tp,
+                'id_smt'           => $this->id_smt,
                 'nip'              => $this->nip,
                 'nama_guru'        => $this->nama_guru,
                 'email'            => $this->email,
@@ -305,6 +319,8 @@ class Guru extends Component
             ]);
 
             JabatanGuru::where('id_guru', $this->dataId)->update([
+                'id_tp'      => $this->id_tp,
+                'id_smt'     => $this->id_smt,
                 'id_jabatan' => $this->id_jabatan,
                 'id_kelas'   => $this->id_jabatan == '4' ? $this->id_kelas : '0',
             ]);
@@ -321,7 +337,11 @@ class Guru extends Component
             foreach ($this->id_mapel_kelas as $id_mapel => $kelasIds) {
                 foreach ($kelasIds as $id_kelas) {
                     JabatanGuruDetail::updateOrCreate(
-                        ['id_jabatan_guru' => $this->id_jabatan_guru, 'id_mapel' => $id_mapel, 'id_kelas' => $id_kelas],
+                        [
+                            'id_jabatan_guru' => $this->id_jabatan_guru,
+                            'id_mapel' => $id_mapel,
+                            'id_kelas' => $id_kelas
+                        ],
                         []
                     );
                 }

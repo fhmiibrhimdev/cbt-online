@@ -7,6 +7,7 @@ use App\Models\Jadwal;
 use Livewire\Component;
 use App\Models\JenisUjian;
 use App\Models\KopAbsensi;
+use App\Helpers\GlobalHelper;
 use App\Models\TahunPelajaran;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
@@ -20,9 +21,13 @@ class JadwalPengawas extends Component
     public $id_jenises;
     public $id_jenis_ujian, $tgl_mulai, $tgl_akhir, $ttds;
     public $tahun_pelajaran, $nama_jenis, $data;
+    public $id_tp, $id_smt;
 
     public function mount($id_jenis_ujian = "0", $tgl_mulai = "0", $tgl_akhir = "0", $ttds = "0")
     {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
         $data = KopAbsensi::findOrFail('1');
         $this->header_1       = $data->header_1;
         $this->header_2       = $data->header_2;
@@ -40,6 +45,7 @@ class JadwalPengawas extends Component
             $this->data = collect();
             $this->ujians = Jadwal::select('jenis_ujian.id', 'jenis_ujian.nama_jenis')
                 ->join('jenis_ujian', 'jenis_ujian.id', 'jadwal.id_jenis_ujian')
+                ->where('id_tp', $this->id_tp)
                 ->distinct()
                 ->get();
 
@@ -73,6 +79,7 @@ class JadwalPengawas extends Component
     {
         $this->ujians = Jadwal::select('jenis_ujian.id', 'jenis_ujian.nama_jenis')
             ->join('jenis_ujian', 'jenis_ujian.id', 'jadwal.id_jenis_ujian')
+            ->where('id_tp', $this->id_tp)
             ->distinct()
             ->get();
 
@@ -105,9 +112,11 @@ class JadwalPengawas extends Component
             ->when($start_date && $end_date, function ($query) use ($start_date, $end_date) {
                 return $query->whereBetween('jadwal.tgl_mulai', [$start_date, $end_date]);
             })
-            ->where('jadwal.id_jenis_ujian', $id_jenis_ujian)
+            ->where([
+                ['jadwal.id_jenis_ujian', $id_jenis_ujian],
+                ['jadwal.id_tp', $this->id_tp],
+            ])
             ->orderBy('bank_soal.id', 'asc')
             ->get();
-        // dd($this->data);
     }
 }

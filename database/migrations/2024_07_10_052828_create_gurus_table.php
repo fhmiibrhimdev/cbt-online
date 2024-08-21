@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('guru', function (Blueprint $table) {
             $table->id();
+            $table->text('id_tp')->default('');
+            $table->text('id_smt')->default('');
             $table->text('id_user')->default('');
             $table->text('nip')->default('');
             $table->text('nama_guru')->default('');

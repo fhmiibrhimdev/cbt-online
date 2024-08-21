@@ -5,6 +5,7 @@ namespace App\Livewire\Pengaturan;
 use App\Models\User;
 use Livewire\Component;
 use Livewire\WithPagination;
+use App\Helpers\GlobalHelper;
 use Livewire\Attributes\Title;
 
 class Guru extends Component
@@ -18,6 +19,13 @@ class Guru extends Component
     public $dataId;
 
     public $where = 'guru';
+    public $id_tp, $id_smt;
+
+    public function mount()
+    {
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+    }
 
     public function updatingLengthData()
     {
@@ -45,6 +53,8 @@ class Guru extends Component
             ->where('roles.name', $this->where)
             ->join('role_user', 'role_user.user_id', 'users.id')
             ->join('roles', 'roles.id', 'role_user.role_id')
+            ->join('guru', 'guru.id_user', 'users.id')
+            ->where('guru.id_tp', $this->id_tp)
             ->paginate($this->lengthData);
 
         return view('livewire.pengaturan.guru', compact('data'));
@@ -59,7 +69,11 @@ class Guru extends Component
     {
         User::join('role_user', 'users.id', 'role_user.user_id')
             ->join('roles', 'roles.id', 'role_user.role_id')
-            ->where('roles.name', $this->where)
+            ->join('guru', 'guru.id_user', 'users.id')
+            ->where([
+                ['roles.name', $this->where],
+                ['guru.id_tp', $this->id_tp],
+            ])
             ->update(['users.active' => $active]);
     }
 }

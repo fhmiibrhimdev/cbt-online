@@ -6,8 +6,10 @@ use App\Models\Kelas;
 use App\Models\Siswa;
 use Livewire\Component;
 use App\Models\KopKartu;
+use App\Helpers\GlobalHelper;
 use App\Models\ProfileSekolah;
 use Livewire\Attributes\Title;
+use App\Models\FormatNomorPeserta;
 use Illuminate\Support\Facades\DB;
 
 class KartuPeserta extends Component
@@ -18,10 +20,19 @@ class KartuPeserta extends Component
     public $nomor_peserta, $nama_peserta, $nis_nisn, $kelas, $ruang_sesi, $username, $password, $ukuran_ttd;
     public $id_kelas, $id_kelases = '0', $banyak_aktif, $kelases, $data = [];
     public $profile_sekolah;
+    public $kode_jenjang, $kode_tahun, $kode_provinsi, $kode_kota, $kode_sekolah;
+    public $id_tp, $id_smt;
+    public $nama_kepsek, $nip_kepsek;
 
     public function mount($id_kelas = null)
     {
         $this->id_kelas = $id_kelas;
+        $this->id_tp    = GlobalHelper::getActiveTahunPelajaranId();
+        $this->id_smt   = GlobalHelper::getActiveSemesterId();
+
+        $profile_sekolah = ProfileSekolah::first();
+        $this->nama_kepsek = $profile_sekolah->kepala_sekolah;
+        $this->nip_kepsek = $profile_sekolah->nip;
 
         $data = KopKartu::findOrFail('1');
         $this->header_1      = $data->header_1;
@@ -39,7 +50,19 @@ class KartuPeserta extends Component
         $this->password      = $data->password;
         $this->ukuran_ttd    = $data->ukuran_ttd;
 
-        $this->kelases = DB::table('kelas')->select('kelas.id', 'kode_kelas', 'level')->leftJoin('level', 'level.id', 'kelas.id_level')->get();
+        $format = FormatNomorPeserta::first();
+        $this->kode_jenjang = $format->kode_jenjang;
+        $this->kode_tahun = $format->kode_tahun;
+        $this->kode_provinsi = $format->kode_provinsi;
+        $this->kode_kota = $format->kode_kota;
+        $this->kode_sekolah = $format->kode_sekolah;
+
+        $this->kelases = DB::table('kelas')
+            ->select('kelas.id', 'kode_kelas', 'level')
+            ->leftJoin('level', 'level.id', 'kelas.id_level')
+            ->where('kelas.id_tp', $this->id_tp)
+            ->get()
+            ->groupBy('level');
 
         if ($this->id_kelas != "0") {
             $this->data = Siswa::select('nomor_peserta', 'siswa.nama_siswa as nama_peserta', 'siswa.nis', 'siswa.nisn', 'kelas.kode_kelas', 'ruang.kode_ruang', 'sesi.kode_sesi', 'users.email as username', 'siswa.tgl_lahir as password', 'level')
@@ -50,7 +73,10 @@ class KartuPeserta extends Component
                 ->leftJoin('ruang', 'ruang.id', 'sesi_siswa.id_ruang')
                 ->leftJoin('sesi', 'sesi.id', 'sesi_siswa.id_sesi')
                 ->leftJoin('users', 'users.id', 'siswa.id_user')
-                ->where('kelas.id', $this->id_kelas)
+                ->where([
+                    ['kelas.id', $this->id_kelas],
+                    ['siswa.id_tp', $this->id_tp],
+                ])
                 ->get();
         }
 
