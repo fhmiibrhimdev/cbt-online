@@ -19,8 +19,8 @@ Ikuti langkah-langkah di bawah ini untuk mengatur dan menjalankan proyek ini di 
 1. Clone repositori ini
 
     ```bash
-    git clone https://github.com/fhmiibrhimdev/livewire-3.git
-    cd livewire-3
+    git clone https://github.com/fhmiibrhimdev/cbt-online.git
+    cd cbt-online
     ```
 
 2. Buka Terminal, lalu Install dependencies PHP menggunakan Composer
@@ -64,6 +64,7 @@ Ikuti langkah-langkah di bawah ini untuk mengatur dan menjalankan proyek ini di 
 7. Buat symbolic link untuk storage
     ```bash
     php artisan storage:link
+    php artisan migrate:fresh --seed
     ```
 
 ## Penggunaan
