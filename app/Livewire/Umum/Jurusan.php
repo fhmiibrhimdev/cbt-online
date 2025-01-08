@@ -89,8 +89,8 @@ class Jurusan extends Component
 
     private function resetInputFields()
     {
-        $this->nama_jurusan = '';
-        $this->kode_jurusan = '';
+        $this->nama_jurusan    = '';
+        $this->kode_jurusan    = '';
         $this->mapel_peminatan = [];
     }
 
@@ -115,12 +115,12 @@ class Jurusan extends Component
 
     public function edit($id)
     {
-        $this->isEditing = true;
-        $data = ModelsJurusan::findOrFail($id);
-        $this->dataId = $id;
-        $this->nama_jurusan     = $data->nama_jurusan;
-        $this->kode_jurusan     = $data->kode_jurusan;
-        $this->mapel_peminatan  = explode(',', $data->mapel_peminatan);
+        $this->isEditing       = true;
+        $data                  = ModelsJurusan::findOrFail($id);
+        $this->dataId          = $id;
+        $this->nama_jurusan    = $data->nama_jurusan;
+        $this->kode_jurusan    = $data->kode_jurusan;
+        $this->mapel_peminatan = explode(',', $data->mapel_peminatan);
         $this->dispatch('initSelect2');
     }
 

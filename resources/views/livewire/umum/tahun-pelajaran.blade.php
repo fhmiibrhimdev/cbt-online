@@ -37,30 +37,37 @@
                                     </thead>
                                     <tbody>
                                         @forelse ($tahun_pelajarans as $tahun_pelajaran)
-                                        <tr>
-                                            <td class="text-center">{{ $loop->index + 1 }}</td>
-                                            <td>{{ $tahun_pelajaran->tahun }}</td>
-                                            <td class="text-center">
-                                                @if ($tahun_pelajaran->active == "1")
-                                                <i class="fas fa-check text-success"></i> AKTIF
-                                                @else
-                                                <button wire:click.prevent="active({{ $tahun_pelajaran->id }}, 'tahun_pelajaran')" class="btn btn-sm btn-info">
-                                                    AKTIFKAN
-                                                </button>
-                                                @endif
-                                            </td>
-                                            <td class="text-center">
-                                                <button wire:click.prevent="edit({{ $tahun_pelajaran->id }})" class="btn btn-primary" data-toggle="modal" data-target="#formDataModal">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button wire:click.prevent="deleteConfirm({{ $tahun_pelajaran->id }})" class="btn btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td class="text-center">{{ $loop->index + 1 }}</td>
+                                                <td>{{ $tahun_pelajaran->tahun }}</td>
+                                                <td class="text-center">
+                                                    @if ($tahun_pelajaran->active == '1')
+                                                        <i class="fas fa-check text-success"></i> AKTIF
+                                                    @else
+                                                        <button
+                                                            wire:click.prevent="active({{ $tahun_pelajaran->id }}, 'tahun_pelajaran')"
+                                                            class="btn btn-sm btn-info">
+                                                            AKTIFKAN
+                                                        </button>
+                                                    @endif
+                                                </td>
+                                                <td class="text-center">
+                                                    <button wire:click.prevent="edit({{ $tahun_pelajaran->id }})"
+                                                        class="btn btn-primary" data-toggle="modal"
+                                                        data-target="#formDataModal">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button
+                                                        wire:click.prevent="deleteConfirm({{ $tahun_pelajaran->id }})"
+                                                        class="btn btn-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center">Not data available in the table</td>
+                                                <td colspan="4" class="text-center">Not data available in the table
+                                                </td>
                                             </tr>
                                         @endforelse
                                     </tbody>
@@ -86,22 +93,25 @@
                                     </thead>
                                     <tbody>
                                         @forelse ($semesters as $semester)
-                                        <tr>
-                                            <td>{{ $semester->semester }}</td>
-                                            <td class="text-center">
-                                            @if ($semester->active == "1")
-                                                <i class="fas fa-check text-success"></i> AKTIF
-                                            @else
-                                            <button wire:click.prevent="active({{ $semester->id }}, 'semester')" class="btn btn-sm btn-info">
-                                                AKTIFKAN
-                                            </button>
-                                            @endif
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td>{{ $semester->semester }}</td>
+                                                <td class="text-center">
+                                                    @if ($semester->active == '1')
+                                                        <i class="fas fa-check text-success"></i> AKTIF
+                                                    @else
+                                                        <button
+                                                            wire:click.prevent="active({{ $semester->id }}, 'semester')"
+                                                            class="btn btn-sm btn-info">
+                                                            AKTIFKAN
+                                                        </button>
+                                                    @endif
+                                                </td>
+                                            </tr>
                                         @empty
-                                        <tr>
-                                            <td colspan="2" class="text-center">Not data available in the table</td>
-                                        </tr>
+                                            <tr>
+                                                <td colspan="2" class="text-center">Not data available in the table
+                                                </td>
+                                            </tr>
                                         @endforelse
                                     </tbody>
                                 </table>
@@ -131,7 +141,9 @@
                         <div class="form-group">
                             <label for="tahun">Tahun</label>
                             <input type="text" wire:model="tahun" id="tahun" class="form-control">
-                            @error('tahun') <small class='text-danger'>{{ $message }}</small> @enderror
+                            @error('tahun')
+                                <small class='text-danger'>{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

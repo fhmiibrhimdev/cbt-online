@@ -110,6 +110,9 @@
                         <p class="mb-3 mt-2 tw-font-semibold tw-text-base tw-text-[#34395e]">Bentuk Format:
                             {{ $kode_jenjang }}-{{ $kode_tahun }}-{{ $kode_provinsi }}-{{ $kode_kota }}-{{ $kode_sekolah }}-XXXX-X
                         </p>
+                        <p class="mb-3">Bisa dicari kodenya disitus ini: <a class="text-primary"
+                                href="https://kodewilayah.id/" target="_BLANK">Kode
+                                Wilayah</a></p>
                         <div class="form-group">
                             <label for="kode_jenjang">Kode Jenjang<small class="text-danger"> *(A) </small></label>
                             <select wire:model="kode_jenjang" id="kode_jenjang" class="form-control">

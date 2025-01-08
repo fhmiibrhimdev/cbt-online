@@ -13,7 +13,7 @@ class ProfileSekolah extends Component
 {
     use WithFileUploads;
     #[Title('Profile Sekolah')]
-    #[Validate('nullable|image|max:1024')] // 1MB Max
+    #[Validate('nullable|image|max:4096')] // 1MB Max
     public $nama_aplikasi, $nama_sekolah, $nss_nsm, $npsn, $jenjang, $satuan_pendidikan, $alamat, $desa_kelurahan, $kecamatan, $kabupaten_kota, $kodepos, $provinsi, $faksimili, $website, $email, $nomor_telepon, $kepala_sekolah, $nip, $ttd, $logo_aplikasi, $logo_sekolah;
 
     public function mount()

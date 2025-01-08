@@ -182,8 +182,8 @@
                                     class="tw-shadow tw-shadow-gray-300 tw-rounded-md tw-p-8 tw-max-w-screen-md tw-w-[210mm] tw-h-[297mm] tw-bg-white">
                                     <div
                                         class="tw-flex tw-justify-between tw-items-center tw-mb-2 tw-border-b tw-border-black tw-pb-5">
-                                        <img src="http://localhost:8081/uploads/settings/logo_kiri.png" alt="Logo Left"
-                                            class="tw-h-20">
+                                        <img src="{{ Storage::url(\App\Models\ProfileSekolah::first('logo_aplikasi')->logo_aplikasi) }}"
+                                            alt="Logo Left" class="tw-h-20">
                                         <div class="tw-text-center px-1">
                                             <h1 class="tw-text-base tw-font-bold tw-text-gray-700">DAFTAR PESERTA
                                             </h1>
@@ -193,7 +193,7 @@
                                             </h4>
                                             <h4 class="tw-text-xs">{{ $header_4 }}</h4>
                                         </div>
-                                        <img src="http://localhost:8081/uploads/settings/logo_kanan.png"
+                                        <img src="{{ Storage::url(\App\Models\ProfileSekolah::first('logo_sekolah')->logo_sekolah) }}"
                                             alt="Logo Right" class="tw-h-20">
                                     </div>
                                     <div class="tw-mt-5">

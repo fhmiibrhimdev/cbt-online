@@ -139,7 +139,9 @@
                                             );
                                         @endphp
 
-                                        @if ($isWithinTimeRange && ($jadwal->status_ujian == '0' || $jadwal->status_ujian == ''))
+                                        @if (
+                                            $isWithinTimeRange &&
+                                                ($jadwal->status_ujian == '0' || $jadwal->status_ujian == '' || $jadwal->status_ujian == null))
                                             <a href="{{ url('/siswa/konfirmasi/' . Crypt::encryptString($jadwal->id)) }}"
                                                 class="btn btn-primary tw-rounded-none form-control tw-mt-4">
                                                 <i class="fas fa-edit"></i> MULAI

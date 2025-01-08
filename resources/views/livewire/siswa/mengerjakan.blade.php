@@ -216,29 +216,30 @@
     <script>
         const detectZoom = () => {
             const zoomLevel = Math.round(window.devicePixelRatio * 100);
-            if (zoomLevel !== 100) {
-                Swal.fire({
-                    title: 'Terdeteksi!',
-                    icon: 'error',
-                    html: 'Dilarang mengubah zoom halaman, segera kembalikan zoom halaman ke 100% di tombol kanan pojok atas',
-                })
-                $('.main-content').html('');
-            } else {
-                Swal.fire({
-                    title: 'Peraturan Ujian',
-                    icon: 'info',
-                    html: 'Kerjakan soal dengan serius, tidak boleh nyontek!<br>Nyontek bisa terdeksi disistem',
-                    // showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Iya',
-                    allowOutsideClick: false
-                }).then((result) => {
-                    if (result.value) {
-                        openFullscreen();
-                    }
-                });
-            }
+            // alert(zoomLevel)
+            // if (zoomLevel !== 100) {
+            //     Swal.fire({
+            //         title: 'Terdeteksi!',
+            //         icon: 'error',
+            //         html: 'Dilarang mengubah zoom halaman, segera kembalikan zoom halaman ke 100% di tombol kanan pojok atas',
+            //     })
+            //     $('.main-content').html('');
+            // } else {
+            Swal.fire({
+                title: 'Peraturan Ujian',
+                icon: 'info',
+                html: 'Kerjakan soal dengan serius, tidak boleh nyontek!<br>Nyontek bisa terdeksi disistem',
+                // showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Iya',
+                allowOutsideClick: false
+            }).then((result) => {
+                if (result.value) {
+                    openFullscreen();
+                }
+            });
+            // }
         };
         $(document).ready(function() {
             detectZoom();
@@ -304,8 +305,8 @@
             document.addEventListener('visibilitychange', function() {
                 if (document.visibilityState === 'visible') {
                     Swal.fire({
-                        title: 'Peringatan Keras!',
-                        html: 'Dilarang curang dalam ujian <b>membuka tab baru</b>, Anda akan dikenakan sanksi jika terus melanggar!',
+                        title: 'Terdeteksi!',
+                        html: 'Dilarang curang dalam ujian <b>membuka tab baru</b>, sistem mencatat anda! Jika terus melanggar anda akan tidak dapat mengikuti ujian!',
                         icon: 'warning',
                         confirmButtonText: 'OK',
                     });

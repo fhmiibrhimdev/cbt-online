@@ -182,20 +182,20 @@ class MataPelajaran extends Component
     public function edit($id, $mode)
     {
         $this->isEditing = true;
-        $this->dataId = $id;
+        $this->dataId    = $id;
         if ($mode == "kelompok") {
-            $data = KelompokMapel::findOrFail($id);
-            $this->kategori  = $data->kategori;
-            $this->kode_kelompok  = $data->kode_kelompok;
-            $this->nama_kelompok  = $data->nama_kelompok;
-            $this->id_parent  = $data->id_parent;
+            $data                = KelompokMapel::findOrFail($id);
+            $this->kategori      = $data->kategori;
+            $this->kode_kelompok = $data->kode_kelompok;
+            $this->nama_kelompok = $data->nama_kelompok;
+            $this->id_parent     = $data->id_parent;
         } else if ($mode == "mapel") {
-            $data = ModelsMataPelajaran::findOrFail($id);
-            $this->id_kelompok  = $data->id_kelompok;
+            $data              = ModelsMataPelajaran::findOrFail($id);
+            $this->id_kelompok = $data->id_kelompok;
             $this->nama_mapel  = $data->nama_mapel;
             $this->kode_mapel  = $data->kode_mapel;
-            $this->no_urut  = $data->no_urut;
-            $this->status  = $data->status;
+            $this->no_urut     = $data->no_urut;
+            $this->status      = $data->status;
         }
         $this->dispatch('initSelect2');
     }
@@ -204,12 +204,10 @@ class MataPelajaran extends Component
     {
         if ($this->dataId) {
             $this->validate($this->getValidationRule($mode));
-
             $this->updateData($mode);
-
             $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');
             $this->isEditing = false;
-            $this->dataId = null;
+            $this->dataId    = null;
         }
     }
 

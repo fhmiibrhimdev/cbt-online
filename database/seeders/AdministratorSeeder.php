@@ -20,7 +20,7 @@ class AdministratorSeeder extends Seeder
                 'name' => 'Administrator',
                 'email' => 'admin@cbt',
                 'email_verified_at' => '',
-                'password' => Hash::make('qweqweasd'),
+                'password' => Hash::make('31750321'),
                 'active' => '1',
                 'remember_token' => '',
                 'created_at' => now(),

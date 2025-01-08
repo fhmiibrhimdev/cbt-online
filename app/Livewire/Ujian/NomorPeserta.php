@@ -31,11 +31,11 @@ class NomorPeserta extends Component
         $this->siswas = collect();
 
         $format = FormatNomorPeserta::first();
-        $this->kode_jenjang = $format->kode_jenjang;
-        $this->kode_tahun = $format->kode_tahun;
+        $this->kode_jenjang  = $format->kode_jenjang;
+        $this->kode_tahun    = $format->kode_tahun;
         $this->kode_provinsi = $format->kode_provinsi;
-        $this->kode_kota = $format->kode_kota;
-        $this->kode_sekolah = $format->kode_sekolah;
+        $this->kode_kota     = $format->kode_kota;
+        $this->kode_sekolah  = $format->kode_sekolah;
 
         $this->kelass  = DB::table('kelas')->select('kelas.id', 'kode_kelas', 'level', 'level.id as id_level')
             ->leftJoin('level', 'level.id', 'kelas.id_level')

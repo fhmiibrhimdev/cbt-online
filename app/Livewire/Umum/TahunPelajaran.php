@@ -19,17 +19,14 @@ class TahunPelajaran extends Component
     ];
 
     protected $rules = [
-        'tahun'               => 'required|unique:tahun_pelajaran',
+        'tahun' => 'required|unique:tahun_pelajaran',
     ];
 
     public $lengthData         = 25;
-    public $searchTerm;
     public $previousSearchTerm = '';
     public $isEditing          = false;
 
-    public $dataId;
-
-    public $tahun;
+    public $searchTerm, $dataId, $tahun;
 
     public function mount()
     {
@@ -39,7 +36,7 @@ class TahunPelajaran extends Component
     public function render()
     {
         $this->searchResetPage();
-        $search           = '%' . $this->searchTerm . '%';
+        $search = '%' . $this->searchTerm . '%';
 
         $tahun_pelajarans = ModelsTahunPelajaran::select('tahun_pelajaran.*')
             ->where(function ($query) use ($search) {
@@ -48,7 +45,8 @@ class TahunPelajaran extends Component
             ->orderBy('id', 'ASC')
             ->paginate($this->lengthData);
 
-        $semesters        = Semester::get();
+        $semesters = Semester::get();
+
 
         return view('livewire.umum.tahun-pelajaran', compact('tahun_pelajarans', 'semesters'));
     }
@@ -145,7 +143,7 @@ class TahunPelajaran extends Component
 
     private function resetInputFields()
     {
-        $this->tahun               = '';
+        $this->tahun = '';
     }
 
     public function cancel()

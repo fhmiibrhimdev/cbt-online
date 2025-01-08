@@ -81,17 +81,23 @@
                 <div class="col-lg-4">
                     <div class="card">
                         <div class="card-body px-4 tw-text-center">
-                            @if ($jadwal->token == '1')
-                                <div class="form-group">
-                                    <label for="token">MASUKKAN TOKEN</label>
-                                    <input type="text" wire:model="token" id="token"
-                                        class="form-control tw-rounded-full tw-uppercase tw-text-center">
-                                </div>
+                            @if ($jadwal->nama_guru == '')
+                                <i class="text-danger">Hubungi Pengawas untuk mengatur nama pengawas terlebih dahulu.
+                                </i>
+                            @else
+                                @if ($jadwal->token == '1')
+                                    <div class="form-group">
+                                        <label for="token">MASUKKAN TOKEN</label>
+                                        <input type="text" wire:model="token" id="token"
+                                            class="form-control tw-rounded-full tw-uppercase tw-text-center">
+                                    </div>
+                                @endif
+                                <button wire:click.prevent="checkToken()"
+                                    class="btn btn-primary form-control tw-rounded-full"><i
+                                        class="fas fa-edit tw-text-sm"></i>
+                                    MULAI</button>
+
                             @endif
-                            <button wire:click.prevent="checkToken()"
-                                class="btn btn-primary form-control tw-rounded-full"><i
-                                    class="fas fa-edit tw-text-sm"></i>
-                                MULAI</button>
                         </div>
                     </div>
                 </div>

@@ -2,7 +2,8 @@
     @if ($by == 'ruang')
         <div class="container header">
             <div class="tw-flex tw-justify-between tw-items-center tw-mb-2 tw-border-b tw-border-black tw-pb-5">
-                <img src="http://localhost:8081/uploads/settings/logo_kiri.png" alt="Logo Left" class="tw-h-[104px]">
+                <img src="{{ Storage::url(\App\Models\ProfileSekolah::first('logo_aplikasi')->logo_aplikasi) }}"
+                    alt="Logo Left" class="tw-h-[104px]">
                 <div class="tw-text-center px-1">
                     <h1 class="tw-text-2xl tw-font-bold tw-text-gray-900">DAFTAR PESERTA
                     </h1>
@@ -13,7 +14,8 @@
                     </h4>
                     <h4 class="tw-text-base tw-text-gray-600">{{ $header_4 }}</h4>
                 </div>
-                <img src="http://localhost:8081/uploads/settings/logo_kanan.png" alt="Logo Right" class="tw-h-[104px]">
+                <img src="{{ Storage::url(\App\Models\ProfileSekolah::first('logo_sekolah')->logo_sekolah) }}"
+                    alt="Logo Right" class="tw-h-[104px]">
             </div>
             <div class="tw-mt-5">
                 <div class="tw-text-gray-900 tw-font-bold tw-mt-10 text-center">

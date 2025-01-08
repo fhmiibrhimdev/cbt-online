@@ -33,8 +33,8 @@ class DatabaseSeeder extends Seeder
             RaportAdminSettingSeeder::class,
             FormatNomorPesertaSeeder::class,
 
-            // AdministratorSeeder::class,
-            // UserAndSiswaSeeder::class,
+            AdministratorSeeder::class,
+            UserAndSiswaSeeder::class,
         ]);
     }
 }

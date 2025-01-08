@@ -115,7 +115,7 @@
                             </div>
                             <div class="tw-flex tw-justify-between tw-items-center tw-mt-2">
                                 <div class="tw-flex tw-flex-col tw-items-center tw-border tw-border-black tw-p-2">
-                                    <img src="http://localhost:8081/assets/img/siswa.png" alt="Student Photo"
+                                    <img src="{{ asset('/assets/logo-siswa.png') }}" alt="Student Photo"
                                         class="tw-h-[70px] tw-w-[60px] tw-border">
                                 </div>
                                 <div class="tw-text-center tw-text-black">

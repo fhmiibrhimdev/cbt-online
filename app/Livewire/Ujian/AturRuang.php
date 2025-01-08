@@ -31,7 +31,7 @@ class AturRuang extends Component
         $this->ruangs   = Ruang::select('id', 'kode_ruang')->get();
         $this->sesis    = Sesi::select('id', 'nama_sesi')->get();
 
-        $this->siswas = [];
+        $this->siswas   = [];
 
         $this->dispatch('initSelect2');
     }
@@ -49,10 +49,6 @@ class AturRuang extends Component
             ->distinct()
             ->get();
 
-        // foreach ($this->data as $key => $value) {
-        //     $this->data[$key]['id_ruang'] = '0';
-        //     $this->data[$key]['id_sesi']  = '0';
-        // }
         $this->data = [];
 
         foreach ($this->siswas as $siswa) {
