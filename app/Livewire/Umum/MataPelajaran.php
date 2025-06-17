@@ -116,7 +116,7 @@ class MataPelajaran extends Component
 
     public function store($mode)
     {
-        $this->validate($this->getValidationRule($mode));
+        $this->validate($this->getValidationRules($mode));
 
         if ($mode == "subkelompok" && $this->id_parent > 0) {
             $this->kategori = KelompokMapel::whereId($this->id_parent)->first()->kategori;
@@ -127,32 +127,37 @@ class MataPelajaran extends Component
         $this->dispatchAlert('success', 'Success!', 'Data created successfully.');
     }
 
-    private function getValidationRule($mode)
+    private function getValidationRules($mode, $id = null)
     {
+        $rules = [];
+
         switch ($mode) {
             case "kelompok":
-                return [
+                $rules = [
                     'kategori'      => 'required',
-                    'kode_kelompok' => 'required',
-                    'nama_kelompok' => 'required',
+                    'kode_kelompok' => 'required|unique:kelompok_mapel,kode_kelompok' . ($id ? ',' . $id : ''),
+                    'nama_kelompok' => 'required|unique:kelompok_mapel,nama_kelompok' . ($id ? ',' . $id : ''),
                 ];
+                break;
             case "subkelompok":
-                return [
-                    'kode_kelompok' => 'required',
-                    'nama_kelompok' => 'required',
+                $rules = [
+                    'kode_kelompok' => 'required|unique:kelompok_mapel,kode_kelompok' . ($id ? ',' . $id : ''),
+                    'nama_kelompok' => 'required|unique:kelompok_mapel,nama_kelompok' . ($id ? ',' . $id : ''),
                     'id_parent'     => 'required',
                 ];
+                break;
             case "mapel":
-                return [
+                $rules = [
                     'id_kelompok'   => 'required',
-                    'nama_mapel'    => 'required',
-                    'kode_mapel'    => 'required',
+                    'nama_mapel'    => 'required|unique:mata_pelajaran,nama_mapel' . ($id ? ',' . $id : ''),
+                    'kode_mapel'    => 'required|unique:mata_pelajaran,kode_mapel' . ($id ? ',' . $id : ''),
                     'status'        => 'required',
                     'no_urut'       => 'required',
                 ];
-            default:
-                return [];
+                break;
         }
+
+        return $rules;
     }
 
     private function createData($mode)
@@ -203,7 +208,7 @@ class MataPelajaran extends Component
     public function update($mode)
     {
         if ($this->dataId) {
-            $this->validate($this->getValidationRule($mode));
+            $this->validate($this->getValidationRules($mode, $this->dataId));
             $this->updateData($mode);
             $this->dispatchAlert('success', 'Success!', 'Data updated successfully.');
             $this->isEditing = false;

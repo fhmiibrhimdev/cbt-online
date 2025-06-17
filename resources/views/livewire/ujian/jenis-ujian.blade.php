@@ -84,10 +84,16 @@
                         <div class="form-group">
                             <label for="nama_jenis">Nama Jenis</label>
                             <input type="text" wire:model="nama_jenis" id="nama_jenis" class="form-control">
+                            @error('nama_jenis')
+                                <small class='text-danger'>{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="form-group">
                             <label for="kode_jenis">Kode Jenis</label>
                             <input type="text" wire:model="kode_jenis" id="kode_jenis" class="form-control">
+                            @error('kode_jenis')
+                                <small class='text-danger'>{{ $message }}</small>
+                            @enderror
                         </div>
                     </div>
                     <div class="modal-footer">

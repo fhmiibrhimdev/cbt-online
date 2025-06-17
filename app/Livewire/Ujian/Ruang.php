@@ -16,10 +16,6 @@ class Ruang extends Component
     protected $listeners = [
         'delete'
     ];
-    protected $rules = [
-        'nama_ruang' => 'required',
-        'kode_ruang' => 'required',
-    ];
 
     public $lengthData         = 25;
     public $searchTerm;
@@ -86,9 +82,19 @@ class Ruang extends Component
         $this->resetInputFields();
     }
 
+    private function getValidationRules($id = null)
+    {
+        $rules = [
+            'nama_ruang' => 'required|unique:ruang,nama_ruang' . ($id ? ',' . $id : ''),
+            'kode_ruang' => 'required|unique:ruang,kode_ruang' . ($id ? ',' . $id : ''),
+        ];
+
+        return $rules;
+    }
+
     public function store()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules());
 
         ModelsRuang::create([
             'nama_ruang' => $this->nama_ruang,
@@ -109,7 +115,7 @@ class Ruang extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules($this->dataId));
 
         if ($this->dataId) {
             ModelsRuang::findOrFail($this->dataId)->update([

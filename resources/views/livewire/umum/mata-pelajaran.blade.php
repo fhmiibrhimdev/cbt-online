@@ -194,7 +194,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="formDataModalLabel">{{ $isEditing ? 'Edit Data' : 'Add Data' }}</h5>
+                    <h5 class="modal-title" id="formDataModalLabel">{{ $isEditing ? 'Edit Data' : 'Mata Pelajaran' }}</h5>
                     <button type="button" wire:click="cancel()" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -244,7 +244,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="formDataKelompokModalLabel">{{ $isEditing ? 'Edit Data' : 'Add Data' }}</h5>
+                    <h5 class="modal-title" id="formDataKelompokModalLabel">{{ $isEditing ? 'Edit Data' : 'Kelompok Utama' }}</h5>
                     <button type="button" wire:click="cancel()" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -274,7 +274,7 @@
                         <div class="form-group">
                             <label for="nama_kelompok">Nama Kelompok</label>
                             <input type="text" wire:model="nama_kelompok" id="nama_kelompok" class="form-control">
-                            @error('kode_kelompok') <small class='text-danger'>{{ $message }}</small> @enderror
+                            @error('nama_kelompok') <small class='text-danger'>{{ $message }}</small> @enderror
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -292,7 +292,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="formDataSubKelompokModalLabel">{{ $isEditing ? 'Edit Data' : 'Add Data' }}</h5>
+                    <h5 class="modal-title" id="formDataSubKelompokModalLabel">{{ $isEditing ? 'Edit Data' : 'Sub Kelompok' }}</h5>
                     <button type="button" wire:click="cancel()" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>

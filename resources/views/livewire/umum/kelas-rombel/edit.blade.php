@@ -15,12 +15,18 @@
                             <div class="form-group">
                                 <label for="nama_kelas">Nama Kelas</label>
                                 <input type="text" wire:model="nama_kelas" id="nama_kelas" class="form-control">
+                                @error('nama_kelas')
+                                    <small class='text-danger'>{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="form-group">
                                 <label for="kode_kelas">Kode Kelas</label>
                                 <input type="text" wire:model="kode_kelas" id="kode_kelas" class="form-control">
+                                @error('kode_kelas')
+                                    <small class='text-danger'>{{ $message }}</small>
+                                @enderror
                             </div>
                         </div>
                         <div class="col-lg-6">

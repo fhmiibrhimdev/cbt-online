@@ -24,13 +24,6 @@ class Siswa extends Component
         'delete'
     ];
 
-    protected $rules = [
-        'nama_siswa' => 'required',
-        'nis'        => 'required',
-        'nisn'       => 'required',
-        'tgl_lahir'  => 'required',
-    ];
-
     public $lengthData         = 25;
     public $searchTerm;
     public $previousSearchTerm = '';
@@ -149,9 +142,21 @@ class Siswa extends Component
         $this->resetInputFields();
     }
 
+    private function getValidationRules($id = null)
+    {
+        $rules = [
+            'nama_siswa' => 'required',
+            'nis'        => 'required|unique:siswa,nis' . ($id ? ',' . $id : ''),
+            'nisn'       => 'required|unique:siswa,nisn' . ($id ? ',' . $id : ''),
+            'tgl_lahir'  => 'required',
+        ];
+
+        return $rules;
+    }
+
     public function store()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules());
 
         $user = User::create([
             'name'     => $this->nama_siswa,
@@ -221,7 +226,7 @@ class Siswa extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules($this->dataId));
 
         if ($this->dataId) {
 

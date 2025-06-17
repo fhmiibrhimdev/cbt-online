@@ -29,10 +29,6 @@ class Guru extends Component
     protected $listeners = [
         'delete'
     ];
-    protected $rules = [
-        'nama_guru' => 'required',
-        'email'     => 'required',
-    ];
 
     public $lengthData = 25;
     public $searchTerm;
@@ -175,9 +171,20 @@ class Guru extends Component
         $this->resetInputFields();
     }
 
+    private function getValidationRules($id = null)
+    {
+        $rules = [
+            'nip' => 'required|unique:guru,nip' . ($id ? ',' . $id : ''),
+            'nama_guru' => 'required|unique:guru,nama_guru' . ($id ? ',' . $id : ''),
+            'email'     => 'required|unique:guru,email' . ($id ? ',' . $id : ''),
+        ];
+
+        return $rules;
+    }
+
     public function store()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules());
 
         $user = User::create([
             'name'     => $this->nama_guru,
@@ -277,7 +284,8 @@ class Guru extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules($this->dataId));
+
 
         if ($this->dataId) {
             User::findOrFail($this->id_user)->update([

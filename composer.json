@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^11.9",
+        "laravel/octane": "^2.6",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
         "santigarcor/laratrust": "^8.3"

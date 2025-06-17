@@ -164,6 +164,7 @@
                     // Total skor adalah skor jawaban benar dan salah (jika ada pertimbangan khusus untuk jawaban salah)
                     $totalScore = $correctScore + $incorrectScore;
                 @endphp
+                {{-- <pre>@json($soalsGroup, JSON_PRETTY_PRINT)</pre> --}}
                 <div class="card">
                     <div class="card-header">
                         <h4 class="tw-font-semibold">{{ $jenisSoalNames[$jenisSoal] }}</h4>
@@ -186,7 +187,7 @@
                                             <th class="tw-whitespace-nowrap">JWB Benar</th>
                                             <th class="tw-whitespace-nowrap">JWB Siswa</th>
                                             <th>Analisa</th>
-                                            <th class="tw-whitespace-nowrap">Point Max. 10</th>
+                                            <th class="tw-whitespace-nowrap">Point Max. {{ $soalsGroup[0]->point_soal }}</th>
                                             @if ($jenisSoal != '1')
                                                 <th><i class="fas fa-cogs"></i></th>
                                             @endif

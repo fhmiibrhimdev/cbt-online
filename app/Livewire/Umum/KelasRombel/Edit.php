@@ -62,7 +62,8 @@ class Edit extends Component
             $unselectedItems = array_diff($this->prev_id_siswa, $flattened_currentlySelected);
 
             $this->validate([
-                'nama_kelas' => 'required',
+                'nama_kelas' => 'required|unique:kelas,nama_kelas,' . $this->dataId,
+                'kode_kelas' => 'required|unique:kelas,kode_kelas,' . $this->dataId,
             ]);
 
             Kelas::findOrFail($this->dataId)->update([

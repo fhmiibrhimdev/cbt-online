@@ -16,9 +16,6 @@ class Ekstrakurikuler extends Component
     protected $listeners = [
         'delete'
     ];
-    protected $rules = [
-        'nama_ekstra' => 'required',
-    ];
 
     public $lengthData = 25;
     public $searchTerm;
@@ -85,9 +82,19 @@ class Ekstrakurikuler extends Component
         $this->resetInputFields();
     }
 
+    private function getValidationRules($id = null)
+    {
+        $rules = [
+            'nama_ekstra' => 'required|unique:ekstrakurikuler,nama_ekstra' . ($id ? ',' . $id : ''),
+            'kode_ekstra' => 'required|unique:ekstrakurikuler,kode_ekstra' . ($id ? ',' . $id : ''),
+        ];
+
+        return $rules;
+    }
+
     public function store()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules());
 
         ModelsEkstrakurikuler::create([
             'nama_ekstra' => $this->nama_ekstra,
@@ -108,7 +115,7 @@ class Ekstrakurikuler extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules($this->dataId));
 
         if ($this->dataId) {
             ModelsEkstrakurikuler::findOrFail($this->dataId)->update([

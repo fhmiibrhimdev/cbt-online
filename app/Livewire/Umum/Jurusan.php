@@ -17,9 +17,6 @@ class Jurusan extends Component
     protected $listeners = [
         'delete'
     ];
-    protected $rules = [
-        'nama_jurusan' => 'required',
-    ];
 
     public $lengthData         = 25;
     public $searchTerm;
@@ -101,7 +98,10 @@ class Jurusan extends Component
 
     public function store()
     {
-        $this->validate();
+        $this->validate([
+            'kode_jurusan' => 'required|unique:jurusan,kode_jurusan',
+            'nama_jurusan' => 'required|unique:jurusan,nama_jurusan',
+        ]);
 
         ModelsJurusan::create([
             'nama_jurusan'      => $this->nama_jurusan,
@@ -126,7 +126,10 @@ class Jurusan extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate([
+            'kode_jurusan' => 'required|unique:jurusan,kode_jurusan,' . $this->dataId,
+            'nama_jurusan' => 'required|unique:jurusan,nama_jurusan,' . $this->dataId,
+        ]);
 
         if ($this->dataId) {
             ModelsJurusan::findOrFail($this->dataId)->update([

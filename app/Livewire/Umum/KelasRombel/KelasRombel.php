@@ -23,9 +23,6 @@ class KelasRombel extends Component
     protected $listeners = [
         'delete'
     ];
-    protected $rules = [
-        'nama_kelas' => 'required',
-    ];
 
     public $lengthData = 25;
     public $searchTerm;
@@ -128,10 +125,20 @@ class KelasRombel extends Component
         $this->resetInputFields();
     }
 
+    private function getValidationRules($id = null)
+    {
+        $rules = [
+            'nama_kelas' => 'required|unique:kelas,nama_kelas' . ($id ? ',' . $id : ''),
+            'kode_kelas' => 'required|unique:kelas,kode_kelas' . ($id ? ',' . $id : ''),
+        ];
+
+        return $rules;
+    }
+
     public function store()
     {
         DB::transaction(function () {
-            $this->validate();
+            $this->validate($this->getValidationRules());
 
             $kelas = Kelas::create([
                 'id_tp'          => $this->id_tp,

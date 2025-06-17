@@ -16,12 +16,6 @@ class Sesi extends Component
     protected $listeners = [
         'delete'
     ];
-    protected $rules = [
-        'nama_sesi'   => 'required',
-        'kode_sesi'   => 'required',
-        'waktu_mulai' => 'required',
-        'waktu_akhir' => 'required',
-    ];
 
     public $lengthData         = 25;
     public $searchTerm;
@@ -85,9 +79,21 @@ class Sesi extends Component
         $this->resetInputFields();
     }
 
+    private function getValidationRules($id = null)
+    {
+        $rules = [
+            'nama_sesi'   => 'required|unique:sesi,nama_sesi' . ($id ? ',' . $id : ''),
+            'kode_sesi'   => 'required|unique:sesi,kode_sesi' . ($id ? ',' . $id : ''),
+            'waktu_mulai' => 'required|unique:sesi,waktu_mulai' . ($id ? ',' . $id : ''),
+            'waktu_akhir' => 'required|unique:sesi,waktu_akhir' . ($id ? ',' . $id : ''),
+        ];
+
+        return $rules;
+    }
+
     public function store()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules());
 
         ModelsSesi::create([
             'nama_sesi'   => $this->nama_sesi,
@@ -112,7 +118,7 @@ class Sesi extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules($this->dataId));
 
         if ($this->dataId) {
             ModelsSesi::findOrFail($this->dataId)->update([

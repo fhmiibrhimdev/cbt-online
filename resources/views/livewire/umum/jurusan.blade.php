@@ -90,10 +90,16 @@
                         <div class="form-group">
                             <label for="kode_jurusan">Kode Jurusan</label>
                             <input type="text" wire:model.live="kode_jurusan" id="kode_jurusan" class="form-control">
+                            @error('kode_jurusan')
+                                <small class='text-danger'>{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="form-group">
                             <label for="nama_jurusan">Nama Jurusan</label>
                             <input type="text" wire:model="nama_jurusan" id="nama_jurusan" class="form-control">
+                            @error('nama_jurusan')
+                                <small class='text-danger'>{{ $message }}</small>
+                            @enderror
                         </div>
                         <div class="form-group">
                             <label for="mapel_peminatan">Mapel Peminatan</label>

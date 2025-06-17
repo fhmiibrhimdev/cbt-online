@@ -20,8 +20,8 @@
                         <p class="show-entries-entries">Entries</p>
                     </div>
                     <div class="search-column">
-                        <p>Search: </p><input type="search" wire:model.live.debounce.750ms="searchTerm"
-                            id="search-data" placeholder="Search here..." class="form-control" value="">
+                        <p>Search: </p><input type="search" wire:model.live.debounce.750ms="searchTerm" id="search-data"
+                            placeholder="Search here..." class="form-control" value="">
                     </div>
                     <div class="table-responsive tw-max-h-96">
                         <table>
@@ -36,33 +36,32 @@
                             </thead>
                             <tbody>
                                 @forelse ($data as $row)
-                                    <tr>
-                                        <td class="text-center">{{ $loop->index + 1 }}</td>
-                                        <td>{{ $row->nama_sesi }}</td>
-                                        <td>{{ $row->kode_sesi }}</td>
-                                        <td>
-                                            {{ $row->waktu_mulai }} s/d {{ $row->waktu_akhir }}
-                                        </td>
-                                        <td class="text-center">
-                                            <button wire:click.prevent="edit({{ $row->id }})"
-                                                class="btn btn-primary" data-toggle="modal"
-                                                data-target="#formDataModal">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            @if ($row->id == "1" || $row->id == "2" || $row->id == "3")
-                                                
-                                            @else
-                                            <button wire:click.prevent="deleteConfirm({{ $row->id }})"
-                                                class="btn btn-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            @endif
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td class="text-center">{{ $loop->index + 1 }}</td>
+                                    <td>{{ $row->nama_sesi }}</td>
+                                    <td>{{ $row->kode_sesi }}</td>
+                                    <td>
+                                        {{ $row->waktu_mulai }} s/d {{ $row->waktu_akhir }}
+                                    </td>
+                                    <td class="text-center">
+                                        <button wire:click.prevent="edit({{ $row->id }})" class="btn btn-primary"
+                                            data-toggle="modal" data-target="#formDataModal">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        @if ($row->id == "1" || $row->id == "2" || $row->id == "3")
+
+                                        @else
+                                        <button wire:click.prevent="deleteConfirm({{ $row->id }})"
+                                            class="btn btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                        @endif
+                                    </td>
+                                </tr>
                                 @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center">Not data available in the table</td>
-                                    </tr>
+                                <tr>
+                                    <td colspan="5" class="text-center">Not data available in the table</td>
+                                </tr>
                                 @endforelse
                             </tbody>
                         </table>
@@ -94,13 +93,19 @@
                                 <div class="form-group">
                                     <label for="nama_sesi">Nama Sesi</label>
                                     <input type="text" wire:model="nama_sesi" id="nama_sesi" class="form-control">
-                                </div>  
+                                    @error('nama_sesi')
+                                    <small class='text-danger'>{{ $message }}</small>
+                                    @enderror
+                                </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label for="kode_sesi">Kode Sesi</label>
                                     <input type="text" wire:model="kode_sesi" id="kode_sesi" class="form-control">
-                                </div>       
+                                    @error('kode_sesi')
+                                    <small class='text-danger'>{{ $message }}</small>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
                         <div class="row">
@@ -108,12 +113,18 @@
                                 <div class="form-group">
                                     <label for="waktu_mulai">Waktu Mulai</label>
                                     <input type="time" wire:model="waktu_mulai" id="waktu_mulai" class="form-control">
+                                    @error('waktu_mulai')
+                                    <small class='text-danger'>{{ $message }}</small>
+                                    @enderror
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label for="waktu_akhir">Waktu Akhir</label>
                                     <input type="time" wire:model="waktu_akhir" id="waktu_akhir" class="form-control">
+                                    @error('waktu_akhir')
+                                    <small class='text-danger'>{{ $message }}</small>
+                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -131,13 +142,13 @@
 </div>
 
 @push('general-css')
-    
+
 @endpush
 
 @push('js-libraries')
-    
+
 @endpush
 
 @push('scripts')
-    
+
 @endpush

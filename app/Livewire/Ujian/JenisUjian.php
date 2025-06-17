@@ -16,10 +16,6 @@ class JenisUjian extends Component
     protected $listeners = [
         'delete'
     ];
-    protected $rules = [
-        'nama_jenis' => 'required',
-        'kode_jenis' => 'required',
-    ];
 
     public $lengthData         = 25;
     public $searchTerm;
@@ -86,9 +82,19 @@ class JenisUjian extends Component
         $this->resetInputFields();
     }
 
+    private function getValidationRules($id = null)
+    {
+        $rules = [
+            'nama_jenis' => 'required|unique:jenis_ujian,nama_jenis' . ($id ? ',' . $id : ''),
+            'kode_jenis' => 'required|unique:jenis_ujian,kode_jenis' . ($id ? ',' . $id : ''),
+        ];
+
+        return $rules;
+    }
+
     public function store()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules());
 
         ModelsJenisUjian::create([
             'nama_jenis' => $this->nama_jenis,
@@ -109,7 +115,7 @@ class JenisUjian extends Component
 
     public function update()
     {
-        $this->validate();
+        $this->validate($this->getValidationRules($this->dataId));
 
         if ($this->dataId) {
             ModelsJenisUjian::findOrFail($this->dataId)->update([

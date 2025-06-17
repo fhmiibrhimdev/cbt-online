@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             SemesterSeeder::class,
             KelompokMapelSeeder::class,
             MataPelajaranSeeder::class,
-            JurusanSeeder::class,
+            // JurusanSeeder::class,
             LevelSeeder::class,
             EkstrakurikulerSeeder::class,
             LevelGuruSeeder::class,

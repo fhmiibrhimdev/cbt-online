@@ -180,13 +180,14 @@
                                 <div class="form-group">
                                     <label for="id_mapel">Mata Pelajaran</label>
                                     <div wire:ignore>
-                                        <select wire:model="id_mapel" id="id_mapel" class="form-control">
+                                        <select wire:model.live="id_mapel" id="id_mapel" class="form-control">
                                             <option value="">-- Opsi Pilihan --</option>
                                             @foreach ($mapels as $mapel)
                                                 <option value="{{ $mapel->id }}">{{ $mapel->nama_mapel }}</option>
                                             @endforeach
                                         </select>
-                                    </div> @error('id_mapel')
+                                    </div> 
+                                    @error('id_mapel')
                                         <small class='text-danger'>{{ $message }}</small>
                                     @enderror
                                 </div>
@@ -466,28 +467,36 @@
     <script>
         window.addEventListener('initSelect2', event => {
             $(document).ready(function() {
-                $('#id_mapel').select2();
+                $('#id_mapel').select2({
+                    dropdownParent: $("#formDataModal")
+                });
                 $('#id_mapel').on('change', function(e) {
                     var id = $(this).attr('id');
                     var data = $(this).select2("val");
                     @this.set(id, data);
                 });
 
-                $('#id_guru').select2();
+                $('#id_guru').select2({
+                    dropdownParent: $("#formDataModal")
+                });
                 $('#id_guru').on('change', function(e) {
                     var id = $(this).attr('id');
                     var data = $(this).select2("val");
                     @this.set(id, data);
                 });
 
-                $('#id_level').select2();
+                $('#id_level').select2({
+                    dropdownParent: $("#formDataModal")
+                });
                 $('#id_level').on('change', function(e) {
                     var id = $(this).attr('id');
                     var data = $(this).select2("val");
                     @this.set(id, data);
                 });
 
-                $('#id_kelas').select2();
+                $('#id_kelas').select2({
+                    dropdownParent: $("#formDataModal")
+                });
                 $('#id_kelas').on('change', function(e) {
                     var id = $(this).attr('id');
                     var data = $(this).select2("val");
