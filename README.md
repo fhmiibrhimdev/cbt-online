@@ -1,8 +1,18 @@
-# Livewire-3 CRUD with Multiple Authentication and Active User
+# CBT Online - Sistem Ujian Berbasis Komputer
 
 ![image](https://github.com/fhmiibrhimdev/livewire-3/assets/129714988/a8977834-c67a-466b-a36c-946f44e42852)
 
-Proyek ini adalah aplikasi Laravel dengan Livewire yang menyediakan fitur CRUD (Create, Read, Update, Delete) dengan dukungan multiple authentication dan manajemen pengguna aktif. Aplikasi ini dirancang untuk mempermudah pengelolaan data dengan antarmuka yang interaktif dan user-friendly.
+CBT Online adalah aplikasi Ujian Berbasis Komputer yang dibangun dengan **Laravel 11** dan **Livewire 3**. Aplikasi ini menyediakan solusi lengkap untuk manajemen ujian sekolah, mulai dari pengelolaan bank soal, penjadwalan, pelaksanaan ujian oleh siswa, hingga rekapitulasi nilai.
+
+Sistem ini mendukung **Multi-Authentication** (Administrator, Guru, Siswa) dan dirancang dengan antarmuka yang modern dan responsif.
+
+## Fitur Unggulan
+
+-   **Manajemen Bank Soal & Jadwal**: Buat soal dan atur jadwal ujian dengan mudah.
+-   **Ujian Online Real-time**: Siswa dapat mengerjakan ujian dengan sistem token dan timer.
+-   **Monitoring Ujian**: Admin dapat memantau status peserta ujian.
+-   **Cetak Dokumen**: Kartu peserta, absen, dan rekap nilai otomatis.
+-   **Multi-Role**: Akses terpisah untuk Admin, Guru, dan Siswa.
 
 ## Prasyarat
 
